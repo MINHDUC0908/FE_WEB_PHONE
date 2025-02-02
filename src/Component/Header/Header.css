@@ -1,0 +1,105 @@
+/* Hiệu ứng từ dưới lên cho hover-element */
+.hover-element {
+    transform: translateY(5px); /* Dịch chuyển 40px xuống để giảm khoảng cách */
+    opacity: 0; /* Ẩn */
+    transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.5s cubic-bezier(0.25, 1, 0.5, 1); /* Tăng thời gian chuyển tiếp */
+}
+
+/* Khi hover vào group, hiển thị hover-element và chạy hiệu ứng */
+.group:hover .hover-element {
+    animation: fadeInUp 0.5s forwards; /* Áp dụng hiệu ứng từ dưới lên */
+}
+
+/* Định nghĩa animation fadeInUp */
+@keyframes fadeInUp {
+    0% {
+        transform: translateY(40px); /* Bắt đầu từ vị trí dưới */
+        opacity: 0; /* Ẩn */
+    }
+    25% {
+        transform: translateY(30px); /* Di chuyển lên một chút */
+        opacity: 0.3; /* Một chút trong suốt */
+    }
+    50% {
+        transform: translateY(15px); /* Di chuyển lên một nửa */
+        opacity: 0.6; /* Gần như nửa trong suốt */
+    }
+    75% {
+        transform: translateY(5px); /* Di chuyển lên gần hơn */
+        opacity: 0.9; /* Gần như hiện */
+    }
+    100% {
+        transform: translateY(0); /* Về vị trí ban đầu */
+        opacity: 1; /* Hiện lên hoàn toàn */
+    }
+}
+
+/* Hiệu ứng từ dưới lên cho hidden-element bên trong Điện thoại */
+.hidden-element {
+    transform: translateY(5px); /* Dịch chuyển 5px xuống để giảm khoảng cách */
+    opacity: 0; /* Ẩn */
+    transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.5s cubic-bezier(0.25, 1, 0.5, 1); /* Tăng thời gian chuyển tiếp */
+}
+
+.hover-element > .relative:hover .hidden-element {
+    animation: fadeInUpHidden 0.5s forwards; /* Áp dụng hiệu ứng từ dưới lên */
+    opacity: 1; /* Hiện lên */
+    display: flex; /* Hiển thị */
+}
+
+/* Định nghĩa animation fadeInUpHidden */
+@keyframes fadeInUpHidden {
+    0% {
+        transform: translateY(5px); /* Bắt đầu từ vị trí dưới */
+        opacity: 0; /* Ẩn */
+    }
+    25% {
+        transform: translateY(3px); /* Di chuyển lên một chút */
+        opacity: 0.3; /* Một chút trong suốt */
+    }
+    50% {
+        transform: translateY(1.5px); /* Di chuyển lên một nửa */
+        opacity: 0.6; /* Gần như nửa trong suốt */
+    }
+    75% {
+        transform: translateY(0.5px); /* Di chuyển lên gần hơn */
+        opacity: 0.9; /* Gần như hiện */
+    }
+    100% {
+        transform: translateY(0); /* Về vị trí ban đầu */
+        opacity: 1; /* Hiện lên hoàn toàn */
+    }
+}
+.group {
+    position: relative; /* Để cho pseudo-element có thể căn chỉnh chính xác */
+}
+
+/* Tạo đường gạch ngang */
+.group::before {
+    content: ""; /* Tạo nội dung rỗng cho pseudo-element */
+    position: absolute; /* Căn chỉnh tuyệt đối */
+    top: -1px; /* Vị trí trên đầu */
+    left: 50%; /* Bắt đầu từ giữa */
+    height: 2px; /* Chiều cao đường gạch */
+    width: 0; /* Chiều rộng bắt đầu từ 0 */
+    background-color: #fea928; /* Màu đường gạch */
+    transition: width 0.5s cubic-bezier(0.25, 1, 0.5, 1), left 0.5s cubic-bezier(0.25, 1, 0.5, 1); /* Tăng thời gian để tăng độ mượt mà */
+}
+
+/* Khi hover vào, mở rộng chiều rộng và di chuyển về bên trái */
+.group:hover::before {
+    width: 100%; /* Mở rộng chiều rộng đến 100% */
+    left: 0; /* Di chuyển về bên trái */
+}
+.category:hover .duc{
+    color: black;
+}
+.hidden-element:hover .category{
+    color: red;
+}
+
+
+.dropdown-up {
+    bottom: 100%; /* Đặt phần tử nằm phía trên của danh mục */
+    top: auto;
+}
