@@ -38,7 +38,7 @@ function New({ setCurrentTitle }) {
                             <div className="grid grid-cols-4 gap-4 my-10">
                                 <div>
                                     <img
-                                        src={`http://127.0.0.1:8000/imgnew/${item.images}`}
+                                        src={`https://duc-phone.onrender.com/imgnew/${item.images}`}
                                         alt={item.title}
                                         className="object-cover transition-transform duration-300 hover:scale-105"
                                     />

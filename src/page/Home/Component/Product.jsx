@@ -130,7 +130,7 @@ function Product() {
                                 <div className="w-full">
                                     <div className="aspect-w-1 aspect-h-1 overflow-hidden mt-10">
                                         <img
-                                            src={`http://127.0.0.1:8000/imgProduct/${item.images}`}
+                                            src={`https://duc-phone.onrender.com/imgProduct/${item.images}`}
                                             alt={item.product_name}
                                             className="object-cover transition-transform duration-300 hover:scale-105"
                                         />
@@ -180,7 +180,7 @@ function Product() {
                                 <div className="w-full">
                                     <div className="aspect-w-1 aspect-h-1 overflow-hidden mt-10">
                                         <img
-                                            src={`http://127.0.0.1:8000/imgProduct/${item.images}`}
+                                            src={`https://duc-phone.onrender.com/imgProduct/${item.images}`}
                                             alt={item.product_name}
                                             className="object-cover transition-transform duration-300 hover:scale-105"
                                         />

@@ -260,7 +260,7 @@ function ViewCart({setCurrentTitle}) {
                                                             </div>
                                                             <div>
                                                                 <img
-                                                                    src={`http://127.0.0.1:8000/imgProduct/${item.product.images}`}
+                                                                    src={`https://duc-phone.onrender.com/imgProduct/${item.product.images}`}
                                                                     alt={item.product.product_name}
                                                                     className="sm:h-[100px] h-[50px] w-full object-cover border border-gray-300 rounded-lg"
                                                                 />

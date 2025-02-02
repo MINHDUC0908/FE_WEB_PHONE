@@ -143,7 +143,7 @@ function ShowProduct({ setCurrentTitle }) {
                 <div className="flex items-center justify-center mb-4">
                     {/* <GrLinkPrevious className="cursor-pointer " onClick={() => handlePrevImg()}/> */}
                     <img
-                        src={`http://127.0.0.1:8000/${
+                        src={`https://duc-phone.onrender.com/${
                         descriptionImages.includes(displayedImage)
                             ? `imgDescriptionProduct/${displayedImage}`
                             : `imgProduct/${displayedImage}`
@@ -171,7 +171,7 @@ function ShowProduct({ setCurrentTitle }) {
                             }`}
                         >
                             <img
-                                src={`http://127.0.0.1:8000/imgProduct/${product.images}`}
+                                src={`https://duc-phone.onrender.com/imgProduct/${product.images}`}
                                 alt={product.product_name}
                                 className="w-full h-full aspect-square object-cover"
                             />
@@ -189,7 +189,7 @@ function ShowProduct({ setCurrentTitle }) {
                                 }`}
                             >
                                 <img
-                                    src={`http://127.0.0.1:8000/imgDescriptionProduct/${image.trim()}`}
+                                    src={`https://duc-phone.onrender.com/imgDescriptionProduct/${image.trim()}`}
                                     alt={`${product.product_name} description ${index + 1}`}
                                     className="w-full h-full aspect-square object-cover"
                                 />

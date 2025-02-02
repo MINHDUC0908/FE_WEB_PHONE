@@ -81,7 +81,7 @@ function ShowNew() {
         <div className="container mx-auto 2xl:px-28 px-4 xl:px-10 my-10">
             <div className="grid grid-cols-2 gap-20">
                 <div>
-                    <img src={`http://127.0.0.1:8000/imgnew/${showNew.images}`} alt={showNew.title} />
+                    <img src={`https://duc-phone.onrender.com/imgnew/${showNew.images}`} alt={showNew.title} />
                 </div>
                 <div>
                     <div className="flex items-center mb-5">
@@ -144,7 +144,7 @@ function ShowNew() {
                                 <div className="grid grid-cols-4 gap-4 p-4">
                                     <div className="flex justify-center items-center">
                                         <img
-                                            src={`http://127.0.0.1:8000/imgnew/${item.images}`}
+                                            src={`https://duc-phone.onrender.com/imgnew/${item.images}`}
                                             alt={item.title}
                                             className="rounded-lg w-full h-auto"
                                         />

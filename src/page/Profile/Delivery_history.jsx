@@ -159,7 +159,7 @@ function DeliveryHistory({ setCurrentTitle }) {
                                             <td className="px-4 py-2 text-center">{order.product.product_name}</td>
                                             <td className="px-4 py-2 text-center">
                                                 <img
-                                                    src={`http://127.0.0.1:8000/imgProduct/${order.product.images}`}
+                                                    src={`https://duc-phone.onrender.com/imgProduct/${order.product.images}`}
                                                     alt={order.product.product_name}
                                                     className="h-full w-full object-cover transform hover:scale-110 transition-transform duration-300"
                                                 />
