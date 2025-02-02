@@ -18,7 +18,7 @@ function ShowNew() {
             return;
         }
         try {
-            const result = await axios.get(`http://127.0.0.1:8000/api/show/${id}`);
+            const result = await axios.get(`https://duc-phone.onrender.com/api/show/${id}`);
             setShowNew(result.data.data || null);
         } catch (error) {
             console.error("Lỗi khi gọi API chi tiết bài viết:", error);
@@ -29,7 +29,7 @@ function ShowNew() {
 
     const fetchNew = async () => {
         try {
-            const result = await axios.get(`http://127.0.0.1:8000/api/new`);
+            const result = await axios.get(`https://duc-phone.onrender.com/api/new`);
             setNews(result.data.data || []);
         } catch (error) {
             console.error("Lỗi khi gọi API danh sách bài viết:", error);

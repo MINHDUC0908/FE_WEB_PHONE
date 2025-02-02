@@ -49,7 +49,7 @@ function Your_account({ setCurrentTitle }) {
     try {
       // Gửi PUT request để cập nhật thông tin người dùng
       const response = await axios.put(
-        `http://127.0.0.1:8000/api/customer/update/${user.id}`,
+        `https://duc-phone.onrender.com/api/customer/update/${user.id}`,
         {
           name: formData.name,
           gender: formData.gender,

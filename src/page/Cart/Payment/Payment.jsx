@@ -76,7 +76,7 @@ function Payment({setCurrentTitle}) {
     }, [selectedDistrict]);
     const fetchShippingAddress = async () => {
         try {
-            const res = await axios.get('http://127.0.0.1:8000/api/address', {
+            const res = await axios.get('https://duc-phone.onrender.com/api/address', {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setShippingAddress(res.data.data);
@@ -102,7 +102,7 @@ function Payment({setCurrentTitle}) {
         }
         try {
             const res = await axios.post(
-                'http://127.0.0.1:8000/api/createAddress/',
+                'https://duc-phone.onrender.com/api/createAddress/',
                 {
                     name,
                     phone,
@@ -148,7 +148,7 @@ function Payment({setCurrentTitle}) {
     };
     const viewCartPayment = async () => {
         try {
-            const res = await axios.get('http://127.0.0.1:8000/api/viewCartPayment',
+            const res = await axios.get('https://duc-phone.onrender.com/api/viewCartPayment',
                 {
                     headers: {
                         Authorization: `Bearer ${token}`
@@ -360,7 +360,7 @@ function Payment({setCurrentTitle}) {
         try {
             setIsLoading(true);
             const response = await axios.post(
-                'http://127.0.0.1:8000/api/checkout',
+                'https://duc-phone.onrender.com/api/checkout',
                 {
                     shipping_address_id: selectedAddress.id,
                 },

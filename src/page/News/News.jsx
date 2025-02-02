@@ -12,7 +12,7 @@ function New({ setCurrentTitle }) {
 
     const fetchNew = async () => {
         try {
-            const result = await axios.get("http://127.0.0.1:8000/api/news");
+            const result = await axios.get("https://duc-phone.onrender.com/api/news");
             if (result && result.data) {
                 setNewTitle(result.data.data);
                 setError("");

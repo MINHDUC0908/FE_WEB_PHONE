@@ -9,7 +9,7 @@ export const GetProductCategoryProvider = ({ children }) => {
     const [id, setId] = useState(null)
     const fetchProductCategory = async (id) => {
         try {
-            const res = await axios.get(`http://127.0.0.1:8000/api/category/${id}/product`);
+            const res = await axios.get(`https://duc-phone.onrender.com/api/category/${id}/product`);
             setProducts(res.data.data);
         } catch (error) {
             setError('Không thể tải sản phẩm.');

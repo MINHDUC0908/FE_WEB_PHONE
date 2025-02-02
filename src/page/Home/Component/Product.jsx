@@ -41,7 +41,7 @@ function Product() {
 
     const fetchIncrementProduct = async () => {
         try {
-            const result = await axios.get("http://127.0.0.1:8000/api/incrementProduct");
+            const result = await axios.get("https://duc-phone.onrender.com/api/incrementProduct");
             if (result && result.data) {
                 const newData = result.data.data;
                 if (JSON.stringify(newData) !== JSON.stringify(incrementProduct)) {
@@ -55,7 +55,7 @@ function Product() {
     };
     const fetchNewProduct = async () => {
         try {
-            const result = await axios.get("http://127.0.0.1:8000/api/ProductNew");
+            const result = await axios.get("https://duc-phone.onrender.com/api/ProductNew");
             if (result && result.data) {
                 const newData = result.data.data;
                 if (JSON.stringify(newData) !== JSON.stringify(newProduct)) {

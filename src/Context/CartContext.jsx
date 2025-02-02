@@ -71,7 +71,7 @@ export const CartProvider = ({ children }) => {
         }
 
         try {
-            const response = await axios.get("http://127.0.0.1:8000/api/cart", {
+            const response = await axios.get("https://duc-phone.onrender.com/api/cart", {
                 headers: { 
                     Authorization: `Bearer ${token}` 
                 },
@@ -85,7 +85,7 @@ export const CartProvider = ({ children }) => {
     };
     const deleteCart = async (id) => {
         try {
-            const res = await axios.delete(`http://127.0.0.1:8000/api/delete/${id}`, {
+            const res = await axios.delete(`https://duc-phone.onrender.com/api/delete/${id}`, {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }

@@ -11,7 +11,7 @@ export const UserProvider = ({ children }) => {
     const fetchUser = async (token) => {
         try {
             setLoading(true);
-            const res = await axios.get('http://127.0.0.1:8000/api/user-profile/', {
+            const res = await axios.get('https://duc-phone.onrender.com/api/user-profile/', {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
@@ -27,14 +27,14 @@ export const UserProvider = ({ children }) => {
     const login = async (formData) => {
         try {
             // 1. Đăng nhập để lấy token
-            const loginRes = await axios.post('http://127.0.0.1:8000/api/login', formData);
+            const loginRes = await axios.post('https://duc-phone.onrender.com/api/login', formData);
             const { token } = loginRes.data;
             
             // 2. Lưu token vào localStorage
             localStorage.setItem('token', token);
             
             // 3. Ngay lập tức gọi API lấy thông tin user
-            const userRes = await axios.get('http://127.0.0.1:8000/api/user-profile/', {
+            const userRes = await axios.get('https://duc-phone.onrender.com/api/user-profile/', {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
@@ -51,7 +51,7 @@ export const UserProvider = ({ children }) => {
         if (token) {
             try {
                 const response = await axios.post(
-                    "http://127.0.0.1:8000/api/logout",
+                    "https://duc-phone.onrender.com/api/logout",
                     {},
                     {
                         headers: {

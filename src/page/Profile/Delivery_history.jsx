@@ -37,8 +37,8 @@ function DeliveryHistory({ setCurrentTitle }) {
             setLoading(true);
             try {
                 const url = status
-                    ? `http://127.0.0.1:8000/api/orders/status/${status}?page=${page}`
-                    : `http://127.0.0.1:8000/api/order?page=${page}`;
+                    ? `https://duc-phone.onrender.com/api/orders/status/${status}?page=${page}`
+                    : `https://duc-phone.onrender.com/api/order?page=${page}`;
                 const res = await axios.get(url, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
@@ -75,7 +75,7 @@ function DeliveryHistory({ setCurrentTitle }) {
         async (id) => {
             try {
                 const res = await axios.put(
-                    `http://127.0.0.1:8000/api/updateOrderStatus/${id}`,
+                    `https://duc-phone.onrender.com/api/updateOrderStatus/${id}`,
                     { status: 'cancelled' }, 
                     {
                         headers: { Authorization: `Bearer ${token}` },
@@ -103,7 +103,7 @@ function DeliveryHistory({ setCurrentTitle }) {
     // xem chi tiết đơn hàng
     const fetchOrderItem = async (id) => {
         try {
-            const res = await axios.get(`http://127.0.0.1:8000/api/showOrder/${id}`,
+            const res = await axios.get(`https://duc-phone.onrender.com/api/showOrder/${id}`,
                 {
                     headers: {
                         Authorization: `Bearer ${token}`

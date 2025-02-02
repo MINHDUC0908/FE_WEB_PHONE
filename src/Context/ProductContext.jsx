@@ -12,7 +12,7 @@ export const ProductProvider = ({ children }) => {
     const [id_product, setId_product] = useState(null);
     const fetchProducts = async () => {
         try {
-            const res = await axios.get('http://127.0.0.1:8000/api/product');
+            const res = await axios.get('https://duc-phone.onrender.com/api/product');
             return res.data.data;
         } catch (error) {
             console.log('Error fetching products:', error);
@@ -40,7 +40,7 @@ export const ProductProvider = ({ children }) => {
     }, []);
     const fetchProductShow = async(id_product) => {
         try {
-            const res = await axios.get(`http://127.0.0.1:8000/api/product/${id_product}`);
+            const res = await axios.get(`https://duc-phone.onrender.com/api/product/${id_product}`);
             setProduct(res.data.data);
         } catch (error) {
             console.log('Error fetching product:', error);

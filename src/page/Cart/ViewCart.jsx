@@ -45,7 +45,7 @@ function ViewCart({setCurrentTitle}) {
     const updateOrder = async (id, token, selected) => {
         try {
             const res = await axios.put(
-                `http://127.0.0.1:8000/api/updateOrder/${id}`,
+                `https://duc-phone.onrender.com/api/updateOrder/${id}`,
                 { selected: selected ? 1 : 0 },
                 {
                     headers: {
@@ -73,7 +73,7 @@ function ViewCart({setCurrentTitle}) {
     
         try {
             const res = await axios.put(
-                `http://127.0.0.1:8000/api/updateAllOrders`,
+                `https://duc-phone.onrender.com/api/updateAllOrders`,
                 { selected: isChecked ? 1 : 0 },
                 {
                     headers: {
@@ -106,7 +106,7 @@ function ViewCart({setCurrentTitle}) {
         }
         try {
             const response = await axios.put(
-                `http://127.0.0.1:8000/api/updateQuantity/${item.id}`, 
+                `https://duc-phone.onrender.com/api/updateQuantity/${item.id}`, 
                 { quantity: newQuantity },
                 {
                     headers: {
@@ -140,7 +140,7 @@ function ViewCart({setCurrentTitle}) {
     const firstCartId = cart[0]?.cart_id;
     const deleteAll = async (id) => {
         try {
-            await axios.delete(`http://127.0.0.1:8000/api/deleteAll/${id}`, 
+            await axios.delete(`https://duc-phone.onrender.com/api/deleteAll/${id}`, 
                 {
                     headers: {
                         Authorization: `Bearer ${token}`,
