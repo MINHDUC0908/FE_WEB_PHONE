@@ -6,13 +6,13 @@
   "engines": {
     "node": ">=16.0.0 <20"
   },
-  "scripts": {
-    "dev": "vite",                            
-    "build": "vite build",                    
-    "lint": "eslint .",                        
-    "preview": "vite preview",                
-    "start": "vite preview --port 5000"      
-  },
+"scripts": {
+  "dev": "vite",
+  "build": "vite build",
+  "lint": "eslint .",
+  "preview": "vite preview",
+  "start": "vite preview --port $PORT"
+},
   "dependencies": {
     "aos": "^2.3.4",
     "axios": "^1.7.9",
