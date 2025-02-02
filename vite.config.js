@@ -5,8 +5,8 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   server: {
-    port: process.env.PORT || 3000, // Render sẽ cung cấp cổng thông qua biến môi trường PORT
-  },
+    port: process.env.PORT || 3000
+  },  
   build: {
     rollupOptions: {
       output: {
