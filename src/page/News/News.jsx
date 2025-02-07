@@ -1,6 +1,7 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { api } from "../../Api";
 
 function New({ setCurrentTitle }) {
     useEffect(() => {
@@ -12,7 +13,7 @@ function New({ setCurrentTitle }) {
 
     const fetchNew = async () => {
         try {
-            const result = await axios.get("https://duc-phone.onrender.com/api/news");
+            const result = await axios.get(api + "news");
             if (result && result.data) {
                 setNewTitle(result.data.data);
                 setError("");

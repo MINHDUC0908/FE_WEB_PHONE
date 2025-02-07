@@ -3,6 +3,7 @@ import { BsPencilSquare } from "react-icons/bs";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { UseDataUser } from "../../Context/UserContext";
+import { api } from "../../Api";
 
 function Your_account({ setCurrentTitle }) {
   const { user } = UseDataUser();
@@ -49,7 +50,7 @@ function Your_account({ setCurrentTitle }) {
     try {
       // Gửi PUT request để cập nhật thông tin người dùng
       const response = await axios.put(
-        `https://duc-phone.onrender.com/api/customer/update/${user.id}`,
+        api + `customer/update/${user.id}`,
         {
           name: formData.name,
           gender: formData.gender,

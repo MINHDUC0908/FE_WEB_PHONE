@@ -2,6 +2,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import img from "../../assets/ai.png";
 import { Link, useLocation } from "react-router-dom";
+import { api } from "../../Api";
 
 function ShowNew() {
     const [showNew, setShowNew] = useState(null); 
@@ -18,7 +19,7 @@ function ShowNew() {
             return;
         }
         try {
-            const result = await axios.get(`https://duc-phone.onrender.com/api/show/${id}`);
+            const result = await axios.get(api + `show/${id}`);
             setShowNew(result.data.data || null);
         } catch (error) {
             console.error("Lỗi khi gọi API chi tiết bài viết:", error);
@@ -29,7 +30,7 @@ function ShowNew() {
 
     const fetchNew = async () => {
         try {
-            const result = await axios.get(`https://duc-phone.onrender.com/api/new`);
+            const result = await axios.get(api + `new`);
             setNews(result.data.data || []);
         } catch (error) {
             console.error("Lỗi khi gọi API danh sách bài viết:", error);

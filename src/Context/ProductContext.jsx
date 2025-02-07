@@ -1,5 +1,6 @@
 import axios from "axios";
 import { createContext, useContext, useEffect, useState } from "react";
+import { api } from "../Api";
 
 const ProductContext = createContext();
 
@@ -12,7 +13,7 @@ export const ProductProvider = ({ children }) => {
     const [id_product, setId_product] = useState(null);
     const fetchProducts = async () => {
         try {
-            const res = await axios.get('https://duc-phone.onrender.com/api/product');
+            const res = await axios.get(api + 'product');
             return res.data.data;
         } catch (error) {
             console.log('Error fetching products:', error);
@@ -40,7 +41,7 @@ export const ProductProvider = ({ children }) => {
     }, []);
     const fetchProductShow = async(id_product) => {
         try {
-            const res = await axios.get(`https://duc-phone.onrender.com/api/product/${id_product}`);
+            const res = await axios.get(api + `product/${id_product}`);
             setProduct(res.data.data);
         } catch (error) {
             console.log('Error fetching product:', error);

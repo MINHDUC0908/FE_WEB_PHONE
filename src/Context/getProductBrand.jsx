@@ -11,7 +11,7 @@ export const GetProductBrandProvider = ({children}) => {
 
     const fetchProductBrand = async (brand_id) => {
         try {
-            const res = await axios.get(`https://duc-phone.onrender.com/api/brand/${brand_id}/product`);
+            const res = await axios.get(api + `brand/${brand_id}/product`);
             setProduct(res.data.data); 
         } catch (error) {
             setError('Không thể tải sản phẩm.');

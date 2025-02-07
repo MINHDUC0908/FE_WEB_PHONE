@@ -9,6 +9,7 @@ import { toast } from "react-toastify";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import { CartData } from "../../Context/CartContext";
+import { api } from "../../Api";
 
 function ViewCart({setCurrentTitle}) {
     const { cart, deleteCart, setCart } = CartData();
@@ -45,7 +46,7 @@ function ViewCart({setCurrentTitle}) {
     const updateOrder = async (id, token, selected) => {
         try {
             const res = await axios.put(
-                `https://duc-phone.onrender.com/api/updateOrder/${id}`,
+                api + `updateOrder/${id}`,
                 { selected: selected ? 1 : 0 },
                 {
                     headers: {
@@ -73,7 +74,7 @@ function ViewCart({setCurrentTitle}) {
     
         try {
             const res = await axios.put(
-                `https://duc-phone.onrender.com/api/updateAllOrders`,
+                api + `updateAllOrders`,
                 { selected: isChecked ? 1 : 0 },
                 {
                     headers: {
@@ -106,7 +107,7 @@ function ViewCart({setCurrentTitle}) {
         }
         try {
             const response = await axios.put(
-                `https://duc-phone.onrender.com/api/updateQuantity/${item.id}`, 
+                api + `updateQuantity/${item.id}`, 
                 { quantity: newQuantity },
                 {
                     headers: {
@@ -140,7 +141,7 @@ function ViewCart({setCurrentTitle}) {
     const firstCartId = cart[0]?.cart_id;
     const deleteAll = async (id) => {
         try {
-            await axios.delete(`https://duc-phone.onrender.com/api/deleteAll/${id}`, 
+            await axios.delete(api + `deleteAll/${id}`, 
                 {
                     headers: {
                         Authorization: `Bearer ${token}`,

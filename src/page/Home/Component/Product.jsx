@@ -4,6 +4,7 @@ import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import Slider from "react-slick";
 import { FaEye } from "react-icons/fa";
 import { useDataProduct } from "../../../Context/ProductContext";
+import { api } from "../../../Api";
 
 // Nút mũi tên quay lại
 function PrevArrow(props) {
@@ -41,7 +42,7 @@ function Product() {
 
     const fetchIncrementProduct = async () => {
         try {
-            const result = await axios.get("https://duc-phone.onrender.com/api/incrementProduct");
+            const result = await axios.get(api + "incrementProduct");
             if (result && result.data) {
                 const newData = result.data.data;
                 if (JSON.stringify(newData) !== JSON.stringify(incrementProduct)) {
@@ -55,7 +56,7 @@ function Product() {
     };
     const fetchNewProduct = async () => {
         try {
-            const result = await axios.get("https://duc-phone.onrender.com/api/ProductNew");
+            const result = await axios.get(api + "ProductNew");
             if (result && result.data) {
                 const newData = result.data.data;
                 if (JSON.stringify(newData) !== JSON.stringify(newProduct)) {

@@ -6,6 +6,7 @@ import { MdDelete } from "react-icons/md";
 import { MdClose } from "react-icons/md";
 import { FaArrowRight } from "react-icons/fa6";
 import { FaArrowLeft } from "react-icons/fa6";
+import { api } from "../../Api";
 
 function DeliveryHistory({ setCurrentTitle }) {
     const [orderStatus, setOrderStatus] = useState([]);
@@ -37,8 +38,8 @@ function DeliveryHistory({ setCurrentTitle }) {
             setLoading(true);
             try {
                 const url = status
-                    ? `https://duc-phone.onrender.com/api/orders/status/${status}?page=${page}`
-                    : `https://duc-phone.onrender.com/api/order?page=${page}`;
+                    ? api + `orders/status/${status}?page=${page}`
+                    : api + `order?page=${page}`;
                 const res = await axios.get(url, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
@@ -75,7 +76,7 @@ function DeliveryHistory({ setCurrentTitle }) {
         async (id) => {
             try {
                 const res = await axios.put(
-                    `https://duc-phone.onrender.com/api/updateOrderStatus/${id}`,
+                    api + `updateOrderStatus/${id}`,
                     { status: 'cancelled' }, 
                     {
                         headers: { Authorization: `Bearer ${token}` },
@@ -103,7 +104,7 @@ function DeliveryHistory({ setCurrentTitle }) {
     // xem chi tiết đơn hàng
     const fetchOrderItem = async (id) => {
         try {
-            const res = await axios.get(`https://duc-phone.onrender.com/api/showOrder/${id}`,
+            const res = await axios.get(api + `showOrder/${id}`,
                 {
                     headers: {
                         Authorization: `Bearer ${token}`

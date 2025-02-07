@@ -6,6 +6,7 @@ import { toast } from "react-toastify";
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { CartData } from "../../../Context/CartContext";
+import { api } from "../../../Api";
 
 function Payment({setCurrentTitle}) {
     const token = localStorage.getItem('token');
@@ -76,7 +77,7 @@ function Payment({setCurrentTitle}) {
     }, [selectedDistrict]);
     const fetchShippingAddress = async () => {
         try {
-            const res = await axios.get('https://duc-phone.onrender.com/api/address', {
+            const res = await axios.get(api + 'address', {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setShippingAddress(res.data.data);
@@ -102,7 +103,7 @@ function Payment({setCurrentTitle}) {
         }
         try {
             const res = await axios.post(
-                'https://duc-phone.onrender.com/api/createAddress/',
+                api + 'createAddress/',
                 {
                     name,
                     phone,
@@ -148,7 +149,7 @@ function Payment({setCurrentTitle}) {
     };
     const viewCartPayment = async () => {
         try {
-            const res = await axios.get('https://duc-phone.onrender.com/api/viewCartPayment',
+            const res = await axios.get(api + 'viewCartPayment',
                 {
                     headers: {
                         Authorization: `Bearer ${token}`
@@ -360,7 +361,7 @@ function Payment({setCurrentTitle}) {
         try {
             setIsLoading(true);
             const response = await axios.post(
-                'https://duc-phone.onrender.com/api/checkout',
+                api + 'checkout',
                 {
                     shipping_address_id: selectedAddress.id,
                 },
