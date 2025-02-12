@@ -5,6 +5,7 @@ import { toast } from "react-toastify";
 import { useDataProduct } from "../../Context/ProductContext";
 import { useData } from "../../Context/DataContext";
 import { CartData } from "../../Context/CartContext";
+import { src } from "../../Api";
 
 
 
@@ -143,7 +144,7 @@ function ShowProduct({ setCurrentTitle }) {
                 <div className="flex items-center justify-center mb-4">
                     {/* <GrLinkPrevious className="cursor-pointer " onClick={() => handlePrevImg()}/> */}
                     <img
-                        src={`https://duc-phone.onrender.com/${
+                        src={src + `${
                         descriptionImages.includes(displayedImage)
                             ? `imgDescriptionProduct/${displayedImage}`
                             : `imgProduct/${displayedImage}`
@@ -171,7 +172,7 @@ function ShowProduct({ setCurrentTitle }) {
                             }`}
                         >
                             <img
-                                src={`https://duc-phone.onrender.com/imgProduct/${product.images}`}
+                                src={src + `imgProduct/${product.images}`}
                                 alt={product.product_name}
                                 className="w-full h-full aspect-square object-cover"
                             />
@@ -189,7 +190,7 @@ function ShowProduct({ setCurrentTitle }) {
                                 }`}
                             >
                                 <img
-                                    src={`https://duc-phone.onrender.com/imgDescriptionProduct/${image.trim()}`}
+                                    src={src + `imgDescriptionProduct/${image.trim()}`}
                                     alt={`${product.product_name} description ${index + 1}`}
                                     className="w-full h-full aspect-square object-cover"
                                 />
@@ -240,7 +241,7 @@ function ShowProduct({ setCurrentTitle }) {
             </div>
         );
     }
-    const LIMIT = 800;
+    const LIMIT = 1800;
     // Nội dung hiển thị
     const content = product.outstanding;
     const truncatedContent = content.length > LIMIT ? content.slice(0, LIMIT) + "..." : content;

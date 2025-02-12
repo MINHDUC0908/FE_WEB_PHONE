@@ -17,7 +17,7 @@ function ViewCart({setCurrentTitle}) {
     const token = localStorage.getItem('token');
     const [modal, setModal] = useState(false);
     const [deleteId, setDeleteId] = useState(null);
-
+    console.log(cart);
     const calculateTotal = useMemo(() => {
         return cart
             .filter(item => item.selected === 1)
