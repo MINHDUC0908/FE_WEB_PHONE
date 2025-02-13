@@ -11,7 +11,7 @@ import { LazyLoadImage } from "react-lazy-load-image-component";
 function Product({ setCurrentTitle }) {
     const { category, groupedBrands } = useData();
     const [open, setOpen] = useState(null);
-    const { products, setProducts, loading, error, setId_product } = useDataProduct();
+    const { products, setProducts, loading, error, setId_product, originalProducts } = useDataProduct();
     const [sortby, setSortBy] = useState("");
     const [sortField, setSortField] = useState("price");
     const [hoveredProduct, setHoveredProduct] = useState(null);
@@ -36,9 +36,13 @@ function Product({ setCurrentTitle }) {
 
     // Sắp xếp sản phẩm
     const handleSort = (sortOrder, field) => {
-        setSortBy(sortOrder);
-        setSortField(field);
+        setSortBy(sortOrder); // Lưu phương thức sắp xếp
+        setSortField(field); // Lưu trường sắp xếp
 
+        if (sortOrder === "default") {
+            setProducts(originalProducts);
+            return;
+        }
         const sortedProducts = [...products].sort((a, b) => {
             return sortOrder === 'asc' 
                 ? a[field] - b[field] 
@@ -76,7 +80,7 @@ function Product({ setCurrentTitle }) {
             {/* Header danh mục */}
             <div className="bg-gradient-to-r from-blue-50 to-blue-100 py-4">
                 <div className="container mx-auto 2xl:px-28 px-4 xl:px-10">
-                    <h1 className="text-lg text-blue-800 font-semibold">Sản phẩm</h1>
+                    <h1 className="text-black font-semibold">Sản phẩm</h1>
                 </div>
             </div>
 
@@ -133,27 +137,27 @@ function Product({ setCurrentTitle }) {
                     {/* Nội dung sản phẩm */}
                     <div className="col-span-4 lg:col-span-4">
                         {/* Các nút sắp xếp */}
-                        <div className="mb-6 bg-white rounded-xl shadow-md border border-blue-100 p-4">
-                            <p className="text-lg font-semibold text-blue-800 border-b border-blue-200 pb-2 mb-4">
+                        <div className="mb-6 bg-white rounded-xl shadow-md border border-blue-100 p-4 flex items-center">
+                            <p className="text-lg font-semibold text-blue-800 ">
                                 Sắp xếp theo
                             </p>
-                            <div className="flex space-x-4">
-                                <button
-                                    className="flex items-center px-6 py-2 text-sm font-medium text-white bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full shadow-lg hover:from-blue-600 hover:to-indigo-700 hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300"
-                                    onClick={() => handleSort('asc', 'price')}
+                            <div className="flex items-center ml-auto">
+                                <select 
+                                    className="px-4 py-2 border rounded-md text-blue-800 font-medium" 
+                                    onChange={(e) => {
+                                        const value = e.target.value;
+                                        if (value === "asc") handleSort("asc", "price");
+                                        else if (value === "desc") handleSort("desc", "price")
+                                        else handleSort("default", "");
+                                    }}
                                 >
-                                    <BiArrowFromBottom className="mr-2" size={20} /> 
-                                    Giá Thấp-Cao
-                                </button>
-                                <button
-                                    className="flex items-center px-6 py-2 text-sm font-medium text-white bg-gradient-to-r from-red-500 to-pink-600 rounded-full shadow-lg hover:from-red-600 hover:to-pink-700 hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300"
-                                    onClick={() => handleSort('desc', 'price')}
-                                >
-                                    <BiArrowToBottom className="mr-2" size={20} /> 
-                                    Giá Cao-Thấp
-                                </button>
+                                    <option value="">Thứ tự mặc định</option>
+                                    <option value="asc">Thứ tự theo giá: Giá Thấp - Cao</option>
+                                    <option value="desc">Thứ tự theo giá: Giá Cao - Thấp</option>
+                                </select>
                             </div>
                         </div>
+
 
                         {/* Lưới sản phẩm */}
                         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">

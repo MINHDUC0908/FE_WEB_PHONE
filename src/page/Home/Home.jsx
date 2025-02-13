@@ -3,6 +3,7 @@ import Hero from "./Component/Hero";
 import Banner from "./Component/Banner";
 import TopBar from "./Component/TopBar";
 import Product from "./Component/Product";
+import FooterProduct from "../Product/FooterProduct";
 
 
 function Home( {setCurrentTitle} )
@@ -27,6 +28,7 @@ function Home( {setCurrentTitle} )
                     </div>
                 </div>
             </div>
+            <FooterProduct />
         </div>
     );
 }

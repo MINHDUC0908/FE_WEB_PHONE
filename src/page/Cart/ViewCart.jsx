@@ -9,7 +9,7 @@ import { toast } from "react-toastify";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import { CartData } from "../../Context/CartContext";
-import { api } from "../../Api";
+import { api, src } from "../../Api";
 
 function ViewCart({setCurrentTitle}) {
     const { cart, deleteCart, setCart } = CartData();
@@ -261,7 +261,7 @@ function ViewCart({setCurrentTitle}) {
                                                             </div>
                                                             <div>
                                                                 <img
-                                                                    src={`https://duc-phone.onrender.com/imgProduct/${item.product.images}`}
+                                                                    src={src + `imgProduct/${item.product.images}`}
                                                                     alt={item.product.product_name}
                                                                     className="sm:h-[100px] h-[50px] w-full object-cover border border-gray-300 rounded-lg"
                                                                 />

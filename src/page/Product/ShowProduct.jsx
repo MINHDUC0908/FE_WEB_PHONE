@@ -6,11 +6,13 @@ import { useDataProduct } from "../../Context/ProductContext";
 import { useData } from "../../Context/DataContext";
 import { CartData } from "../../Context/CartContext";
 import { src } from "../../Api";
+import Related_Product from "./Related_Product";
+import FooterProduct from "./FooterProduct";
 
 
 
-function ShowProduct({ setCurrentTitle }) {
-    const { product, loading, setId_product } = useDataProduct();
+function ShowProduct({ setCurrentTitle,  }) {
+    const { product, loading, setId_product, relatedProducts } = useDataProduct();
     const { category, brand } = useData();
     const [categoryName, setCategoryName] = useState("");
     const [brandName, setBrandName] = useState("");
@@ -21,6 +23,7 @@ function ShowProduct({ setCurrentTitle }) {
     const handleQuantityChange = (value) => {
         setQuantity((prev) => Math.max(1, prev + value));
     };
+    console.log(relatedProducts);
     const [isExpanded, setIsExpanded] = useState(false);
     useEffect(() => {
             const initializeProduct = () => {
@@ -71,12 +74,12 @@ function ShowProduct({ setCurrentTitle }) {
     
     
 
-    const formatPrice = (price) => {
-        return new Intl.NumberFormat("vi-VN", {
-            style: "currency",
-            currency: "VND",
-        }).format(price);
-    };
+    // const formatPrice = (price) => {
+    //     return new Intl.NumberFormat("vi-VN", {
+    //         style: "currency",
+    //         currency: "VND",
+    //     }).format(price);
+    // };
 
     // Breadcrumb component
     const Breadcrumb = () => (
@@ -127,18 +130,18 @@ function ShowProduct({ setCurrentTitle }) {
     
             return () => clearInterval(interval);
         }, [currentIndex, descriptionImages, product.images]);
-        const handleNextImg = () => {
-            const allImages = [product.images, ...descriptionImages];
-            const nextIndex = (currentIndex + 1) % allImages.length;
-            setDisplayedImage(allImages[nextIndex]);
-            setCurrentIndex(nextIndex);
-        }
-        const handlePrevImg = () => {
-            const allImages = [product.images, ...descriptionImages];
-            const nextIndex = (currentIndex - 1 + allImages.length) % allImages.length;
-            setDisplayedImage(allImages[nextIndex]);
-            setCurrentIndex(nextIndex);
-        }
+        // const handleNextImg = () => {
+        //     const allImages = [product.images, ...descriptionImages];
+        //     const nextIndex = (currentIndex + 1) % allImages.length;
+        //     setDisplayedImage(allImages[nextIndex]);
+        //     setCurrentIndex(nextIndex);
+        // }
+        // const handlePrevImg = () => {
+        //     const allImages = [product.images, ...descriptionImages];
+        //     const nextIndex = (currentIndex - 1 + allImages.length) % allImages.length;
+        //     setDisplayedImage(allImages[nextIndex]);
+        //     setCurrentIndex(nextIndex);
+        // }
     return (
             <div className="h-full">
                 <div className="flex items-center justify-center mb-4">
@@ -246,111 +249,115 @@ function ShowProduct({ setCurrentTitle }) {
     const content = product.outstanding;
     const truncatedContent = content.length > LIMIT ? content.slice(0, LIMIT) + "..." : content;
   return (
-        <div className="min-h-screen bg-gray-50">
-            <Breadcrumb />
-            <div className="container mx-auto 2xl:px-28 px-4 xl:px-10 py-8">
-                <div className="grid lg:grid-cols-2 grid-cols-1 gap-8 bg-white shadow-lg">
-                    <div className="col-span-1 -mt-20 sm:mt-8 md:-mt-2 xl:mt-0">
-                        <ProductImage/>
-                    </div>
-                    <div className="col-span-1">
-                        <div className="p-6 space-y-6">
-                            <div className="">
-                                <h1 className="text-3xl text-gray-900">{product.product_name}</h1>
-                            </div>
-                            <div>
-                                <p className="text-xl font-semibold text-[#ff3300]">
-                                    {new Intl.NumberFormat('vi-VN', {
-                                    style: 'currency',
-                                    currency: 'VND',
-                                    }).format(product.price)}
-                                </p>
-                            </div>
-                            <hr />
-                            <div className="prose max-w-none text-gray-600" dangerouslySetInnerHTML={{ __html: product.description }} />
-                            <hr />
-                            <div className="flex gap-2">
-                                {product.colors && product.colors.length > 0 && (
-                                    <div className="flex flex-wrap gap-4 mt-4">
-                                        {product.colors
-                                            .filter(item => item.color !== null)  // Lọc những màu không phải null
-                                            .map((item, index) => (
-                                                <button
-                                                    key={index}
-                                                    className={`text-sm px-4 py-3 border border-gray-300 
-                                                    hover:bg-gray-100 focus:bg-gray-200 
-                                                    ${selectedColor === item.color ? 'border-2 border-red-500' : ''} 
-                                                    ${item.quantity === 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
-                                                    onClick={() => {
-                                                        if (item.quantity > 0) {
-                                                            setSelectedColor(item.color);
-                                                        }
-                                                    }}
-                                                    disabled={item.quantity === 0}
-                                                >
-                                                    {item.color}
-                                                </button>
-                                            ))}
-                                    </div>
-                                )}
-                            </div>
+        <>
+            <div className="min-h-screen bg-gray-50">
+                <Breadcrumb />
+                <div className="container mx-auto 2xl:px-28 px-4 xl:px-10 py-8">
+                    <div className="grid lg:grid-cols-2 grid-cols-1 gap-8 bg-white shadow-lg">
+                        <div className="col-span-1 -mt-20 sm:mt-8 md:-mt-2 xl:mt-0">
+                            <ProductImage/>
+                        </div>
+                        <div className="col-span-1">
+                            <div className="p-6 space-y-6">
+                                <div className="">
+                                    <h1 className="text-3xl text-gray-900">{product.product_name}</h1>
+                                </div>
+                                <div>
+                                    <p className="text-xl font-semibold text-[#ff3300]">
+                                        {new Intl.NumberFormat('vi-VN', {
+                                        style: 'currency',
+                                        currency: 'VND',
+                                        }).format(product.price)}
+                                    </p>
+                                </div>
+                                <hr />
+                                <div className="prose max-w-none text-gray-600" dangerouslySetInnerHTML={{ __html: product.description }} />
+                                <hr />
+                                <div className="flex gap-2">
+                                    {product.colors && product.colors.length > 0 && (
+                                        <div className="flex flex-wrap gap-4 mt-4">
+                                            {product.colors
+                                                .filter(item => item.color !== null)  // Lọc những màu không phải null
+                                                .map((item, index) => (
+                                                    <button
+                                                        key={index}
+                                                        className={`text-sm px-4 py-3 border border-gray-300 
+                                                        hover:bg-gray-100 focus:bg-gray-200 
+                                                        ${selectedColor === item.color ? 'border-2 border-red-500' : ''} 
+                                                        ${item.quantity === 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                                        onClick={() => {
+                                                            if (item.quantity > 0) {
+                                                                setSelectedColor(item.color);
+                                                            }
+                                                        }}
+                                                        disabled={item.quantity === 0}
+                                                    >
+                                                        {item.color}
+                                                    </button>
+                                                ))}
+                                        </div>
+                                    )}
+                                </div>
 
-                            <div className="flex items-center gap-4 mt-4">
-                                <div className="hidden items-center border px-5 py-3 lg:px-3 lg:py-3 sm:block">
+                                <div className="flex items-center gap-4 mt-4">
+                                    <div className="hidden items-center border px-5 py-3 lg:px-3 lg:py-3 sm:block">
+                                        <button
+                                            className="text-gray-500 hover:text-gray-800"
+                                            onClick={() => handleQuantityChange(-1)}
+                                        >
+                                            −
+                                        </button>
+                                        <input
+                                            type="number"
+                                            value={quantity}
+                                            onChange={(e) => setQuantity(Math.max(1, +e.target.value))}
+                                            className="w-12 text-center border-none focus:outline-none"
+                                        />
+                                        <button
+                                            className="text-gray-500 hover:text-gray-800"
+                                            onClick={() => handleQuantityChange(1)}
+                                        >
+                                            +
+                                        </button>
+                                    </div>
                                     <button
-                                        className="text-gray-500 hover:text-gray-800"
-                                        onClick={() => handleQuantityChange(-1)}
+                                        className="flex items-center justify-center gap-1 text-[#ee4d2d] bg-[#ff57221a] border border-red-600 py-2 px-4 sm:py-3"
+                                        onClick={() => handleAddToCartClick()}
                                     >
-                                        −
+                                        <BsCartPlus size={18} className="sm:text-[25px] text-[18px] text-red-500" />
+                                        <span className="text-center text-sm sm:text-base hidden sm:block">Thêm vào giỏ</span>
                                     </button>
-                                    <input
-                                        type="number"
-                                        value={quantity}
-                                        onChange={(e) => setQuantity(Math.max(1, +e.target.value))}
-                                        className="w-12 text-center border-none focus:outline-none"
-                                    />
-                                    <button
-                                        className="text-gray-500 hover:text-gray-800"
-                                        onClick={() => handleQuantityChange(1)}
+                                    <button className="bg-[#ee4d2d] text-white py-2 px-4 sm:py-3 sm:px-6 hover:bg-[#ee2d1d] transition-colors font-medium w-full sm:w-auto"
+                                        onClick={() => handleBuyToCartClick()}
                                     >
-                                        +
+                                        <span className="text-center text-sm sm:text-base">Mua Ngay</span>
                                     </button>
                                 </div>
-                                <button
-                                    className="flex items-center justify-center gap-1 text-[#ee4d2d] bg-[#ff57221a] border border-red-600 py-2 px-4 sm:py-3"
-                                    onClick={() => handleAddToCartClick()}
-                                >
-                                    <BsCartPlus size={18} className="sm:text-[25px] text-[18px] text-red-500" />
-                                    <span className="text-center text-sm sm:text-base hidden sm:block">Thêm vào giỏ</span>
-                                </button>
-                                <button className="bg-[#ee4d2d] text-white py-2 px-4 sm:py-3 sm:px-6 hover:bg-[#ee2d1d] transition-colors font-medium w-full sm:w-auto"
-                                    onClick={() => handleBuyToCartClick()}
-                                >
-                                    <span className="text-center text-sm sm:text-base">Mua Ngay</span>
-                                </button>
                             </div>
                         </div>
                     </div>
-                </div>
-                <hr />
-                <div className="text-gray-600 bg-white p-4 mt-10 rounded-md shadow-xl">
-                    <h2 className="font-bold mb-2">Mô tả sản phẩm</h2>
-                    <div
-                        dangerouslySetInnerHTML={{
-                            __html: isExpanded ? content : truncatedContent,
-                        }}
-                    />
-                    {content.length > LIMIT && (
-                        <button
-                            onClick={() => setIsExpanded(!isExpanded)}
-                            className="mt-2 text-blue-500 hover:underline"
-                        >
-                            {isExpanded ? "Thu gọn" : "Xem thêm"}
-                        </button>
-                    )}
+                    <hr />
+                    <div className="text-gray-600 bg-white p-4 mt-10 rounded-md shadow-xl">
+                        <h2 className="font-bold text-2xl mb-2 text-black">Đặc điểm nổi bật</h2>
+                        <div
+                            dangerouslySetInnerHTML={{
+                                __html: isExpanded ? content : truncatedContent,
+                            }}
+                        />
+                        {content.length > LIMIT && (
+                            <button
+                                onClick={() => setIsExpanded(!isExpanded)}
+                                className="mt-2 text-blue-500 hover:underline"
+                            >
+                                {isExpanded ? "Thu gọn" : "Xem thêm"}
+                            </button>
+                        )}
+                    </div>
                 </div>
             </div>
-        </div>
+            <Related_Product relatedProducts={relatedProducts} setId_product={setId_product}/>
+            <FooterProduct />
+        </>
     );
 }
 

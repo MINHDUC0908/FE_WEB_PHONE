@@ -11,6 +11,8 @@ export const ProductProvider = ({ children }) => {
     const [success, setSuccess] = useState('');
     const [product, setProduct] = useState('');
     const [id_product, setId_product] = useState(null);
+    const [relatedProducts, setRelatedProducts] = useState([]);
+    const [originalProducts, setOriginalProducts] = useState([]);
     const fetchProducts = async () => {
         try {
             const res = await axios.get(api + 'product');
@@ -28,6 +30,7 @@ export const ProductProvider = ({ children }) => {
                 setSuccess('');
             } else {
                 setProducts(result); 
+                setOriginalProducts(result);
                 setSuccess(result.message || 'Products loaded successfully');
                 setError('');
             }
@@ -43,6 +46,7 @@ export const ProductProvider = ({ children }) => {
         try {
             const res = await axios.get(api + `product/${id_product}`);
             setProduct(res.data.data);
+            setRelatedProducts(res.data.related_products);
         } catch (error) {
             console.log('Error fetching product:', error);
             return { error: 'Unable to load product' };
@@ -61,7 +65,7 @@ export const ProductProvider = ({ children }) => {
         return () => clearTimeout(times);
     }, [])
     return (
-        <ProductContext.Provider value={{ products, setProducts, loading, error, success, product, setId_product }}>
+        <ProductContext.Provider value={{ products, setProducts, loading, error, success, product, setId_product, relatedProducts, originalProducts }}>
             {children}
         </ProductContext.Provider>
     );

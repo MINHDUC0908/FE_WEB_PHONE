@@ -6,7 +6,7 @@ import { toast } from "react-toastify";
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { CartData } from "../../../Context/CartContext";
-import { api } from "../../../Api";
+import { api, src } from "../../../Api";
 
 function Payment({setCurrentTitle}) {
     const token = localStorage.getItem('token');
@@ -492,7 +492,7 @@ function Payment({setCurrentTitle}) {
                                         <td className="py-3 px-3 text-center">
                                             <div className="w-24 h-24 flex justify-center items-center relative overflow-hidden rounded-lg">
                                                 <img
-                                                    src={`https://duc-phone.onrender.com/imgProduct/${item.product.images}`}
+                                                    src={src + `imgProduct/${item.product.images}`}
                                                     alt={item.product.product_name}
                                                     className="h-full w-full object-cover transform hover:scale-110 transition-transform duration-300"
                                                 />

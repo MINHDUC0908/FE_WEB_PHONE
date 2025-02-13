@@ -4,7 +4,8 @@ import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import Slider from "react-slick";
 import { FaEye } from "react-icons/fa";
 import { useDataProduct } from "../../../Context/ProductContext";
-import { api } from "../../../Api";
+import { api, src } from "../../../Api";
+import { LazyLoadImage } from "react-lazy-load-image-component";
 
 // Nút mũi tên quay lại
 function PrevArrow(props) {
@@ -39,6 +40,7 @@ function Product() {
     const [newProduct, setNewProduct] = useState([]);
     const [lastUpdated, setLastUpdated] = useState(null);
     const {setId_product} = useDataProduct();
+    const [loaded, setLoaded] = useState(false);
 
     const fetchIncrementProduct = async () => {
         try {
@@ -129,11 +131,20 @@ function Product() {
                                 className="block"
                             >
                                 <div className="w-full">
-                                    <div className="aspect-w-1 aspect-h-1 overflow-hidden mt-10">
-                                        <img
-                                            src={`https://duc-phone.onrender.com/imgProduct/${item.images}`}
-                                            alt={item.product_name}
-                                            className="object-cover transition-transform duration-300 hover:scale-105"
+                                    <div className="h-[250px] mt-5 flex items-center justify-center p-4 bg-gray-50 relative">
+                                        <LazyLoadImage
+                                            src={`${src}storage/${item.thumbnail}`}
+                                            alt="" 
+                                            className={`absolute top-0 left-0 w-full h-full object-contain transition-opacity duration-500 ${loaded ? 'opacity-0' : 'opacity-100'}`}
+                                            loading="lazy"
+                                        />
+                                        <LazyLoadImage
+                                            src={loaded ? `${src}imgProduct/${item.images}` : `${src}storage/${item.thumbnail}`}  // Ảnh chính thay thế ảnh mờ khi tải xong
+                                            alt={item.product_name}  
+                                            className={`w-full h-full object-contain transition-opacity duration-500 transform ${loaded ? 'opacity-100 scale-100' : 'opacity-0 scale-90'}`} 
+                                            onLoad={() => setLoaded(true)}  
+                                            loading="lazy"
+                                            aria-hidden={!loaded} 
                                         />
                                     </div>
                                     <h3
@@ -166,7 +177,7 @@ function Product() {
                     ))}
                 </Slider>
             </div>
-            <div className="bg-slate-50 mb-32 rounded-lg">
+            <div className="bg-slate-50 mb-16 rounded-lg">
                 <h1 className=" text-3xl font-semibold text-gray-800 py-6 ml-6">
                     Sản phẩm mới nhất
                 </h1>
@@ -179,11 +190,20 @@ function Product() {
                                 className="block"
                             >
                                 <div className="w-full">
-                                    <div className="aspect-w-1 aspect-h-1 overflow-hidden mt-10">
-                                        <img
-                                            src={`https://duc-phone.onrender.com/imgProduct/${item.images}`}
-                                            alt={item.product_name}
-                                            className="object-cover transition-transform duration-300 hover:scale-105"
+                                    <div className="h-[250px] mt-5 flex items-center justify-center p-4 bg-gray-50 relative">
+                                        <LazyLoadImage
+                                            src={`${src}storage/${item.thumbnail}`}
+                                            alt="" 
+                                            className={`absolute top-0 left-0 w-full h-full object-contain transition-opacity duration-500 ${loaded ? 'opacity-0' : 'opacity-100'}`}
+                                            loading="lazy"
+                                        />
+                                        <LazyLoadImage
+                                            src={loaded ? `${src}imgProduct/${item.images}` : `${src}storage/${item.thumbnail}`}  // Ảnh chính thay thế ảnh mờ khi tải xong
+                                            alt={item.product_name}  
+                                            className={`w-full h-full object-contain transition-opacity duration-500 transform ${loaded ? 'opacity-100 scale-100' : 'opacity-0 scale-90'}`} 
+                                            onLoad={() => setLoaded(true)}  
+                                            loading="lazy"
+                                            aria-hidden={!loaded} 
                                         />
                                     </div>
                                     <h3
