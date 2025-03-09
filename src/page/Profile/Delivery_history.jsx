@@ -6,7 +6,7 @@ import { MdDelete } from "react-icons/md";
 import { MdClose } from "react-icons/md";
 import { FaArrowRight } from "react-icons/fa6";
 import { FaArrowLeft } from "react-icons/fa6";
-import { api } from "../../Api";
+import { api, src } from "../../Api";
 
 function DeliveryHistory({ setCurrentTitle }) {
     const [orderStatus, setOrderStatus] = useState([]);
@@ -30,6 +30,7 @@ function DeliveryHistory({ setCurrentTitle }) {
         { key: 'Cancel', label: 'Đã hủy' },
     ];
     useEffect(() => {
+        window.scrollTo(0, 0);
         setCurrentTitle("Lịch sử mua hàng");
     }, [setCurrentTitle]);
     // Fetch dữ liệu đơn hàng theo trạng thái
@@ -160,7 +161,7 @@ function DeliveryHistory({ setCurrentTitle }) {
                                             <td className="px-4 py-2 text-center">{order.product.product_name}</td>
                                             <td className="px-4 py-2 text-center">
                                                 <img
-                                                    src={`https://duc-phone.onrender.com/imgProduct/${order.product.images}`}
+                                                    src={`${src}imgProduct/${order.product.images}`}
                                                     alt={order.product.product_name}
                                                     className="h-full w-full object-cover transform hover:scale-110 transition-transform duration-300"
                                                 />
@@ -246,7 +247,8 @@ function DeliveryHistory({ setCurrentTitle }) {
     }
     
     return (
-        <div className="mx-auto lg:p-4">
+        <div className="max-w-5xl mx-auto lg:p-8 bg-white rounded-xl shadow-lg">
+            <h2 className="text-2xl font-bold mb-6 text-center">Lịch sử mua hàng</h2>
             <div className="flex gap-2 lg:gap-4 mb-4 overflow-y-auto whitespace-nowrap min-w-0">
                 {status !== null && 
                     tabs.map((tab) => (

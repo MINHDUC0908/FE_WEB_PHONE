@@ -1,27 +1,32 @@
 import axios from "axios";
 import { createContext, useContext, useEffect, useState } from "react";
+import { api } from "../Api";
 
 const GetProductBrand = createContext();
 
 export const GetProductBrandProvider = ({children}) => {
-    const [products, setProduct] = useState([]);
+    const [products, setProducts] = useState([]);
     const [brand_id, setId_brand] = useState(null);
-    const [error, setError] = useState('');
-    const [loading, setLoading] = useState(true); 
+    const [error, setError] = useState('')
+    const [loading, setLoading] = useState(true);
+    const [originalProducts, setOriginalProducts] = useState([]) 
 
     const fetchProductBrand = async (brand_id) => {
         try {
+            setLoading(true)
             const res = await axios.get(api + `brand/${brand_id}/product`);
-            setProduct(res.data.data); 
+            setProducts(res.data.data); 
+            setOriginalProducts(res.data.data)
         } catch (error) {
             setError('Không thể tải sản phẩm.');
             console.error(error);
+        } finally {
+            setLoading(false)
         }
-    };
+    }; 
 
     useEffect(() => {
         if (brand_id) {
-            setLoading(true);
             fetchProductBrand(brand_id);
         }
     }, [brand_id]);
@@ -33,7 +38,7 @@ export const GetProductBrandProvider = ({children}) => {
     }, [loading]);
 
     return (
-        <GetProductBrand.Provider value={{ products, error, setId_brand, loading }} >
+        <GetProductBrand.Provider value={{ products, error, setId_brand, loading, originalProducts, setProducts }} >
             {children}
         </GetProductBrand.Provider>
     );

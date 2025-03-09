@@ -7,8 +7,8 @@ import ShowNew from "../page/News/ShowNew";
 import Product from "../page/Product/Product";
 import ShowProduct from "../page/Product/ShowProduct";
 import Change_password from "../page/Profile/Change_password";
-import Your_account from "../page/Profile/Your_account";
 import Delivery_history from "../page/Profile/Delivery_history";
+import Your_account from "../page/Profile/Your_account";
 
 export const menu = [
   {

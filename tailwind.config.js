@@ -21,7 +21,10 @@ export default {
           xl: "5rem",
           "2xl": "6rem",
         }
-      }
+      },
+      fontFamily: {
+        montserrat: ['Montserrat', 'sans-serif'], // Định nghĩa font Montserrat
+      },
     },
   },
   plugins: [],

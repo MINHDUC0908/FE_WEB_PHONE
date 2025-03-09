@@ -2,7 +2,7 @@ import { useState } from "react";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import Slider from "react-slick";
-import { src } from "../../Api";
+import { src } from "../../../Api";
 import { HeartIcon, ShoppingCartIcon } from "lucide-react";
 
 // Nút mũi tên quay lại
@@ -40,7 +40,7 @@ function Related_Product({ relatedProducts, setId_product }) {
         speed: 1000,
         autoplay: true,
         autoplaySpeed: 3000,
-        arrows: true,
+        arrows: relatedProducts.length > 3,
         prevArrow: <PrevArrow />,
         nextArrow: <NextArrow />,
         responsive: [
@@ -68,7 +68,7 @@ function Related_Product({ relatedProducts, setId_product }) {
             {
                 breakpoint: 480,
                 settings: {
-                    slidesToShow: 1,
+                    slidesToShow: 2,
                     slidesToScroll: 1,
                 },
             },
@@ -76,17 +76,36 @@ function Related_Product({ relatedProducts, setId_product }) {
     };
     const [loaded, setLoaded] = useState(false)
     const [hoveredProduct, setHoveredProduct] = useState(null);
-    const handleProduct = (id, product_name) => {
+    const handleProduct = (id, product_name, product) => {
         localStorage.setItem("productShow", id)
         localStorage.setItem("productShowName", product_name)
         setId_product(id);
+        let viewedProducts = JSON.parse(localStorage.getItem("viewedProducts")) || [];
+    
+        // Kiểm tra nếu sản phẩm đã tồn tại trong danh sách, thì xóa nó đi trước khi thêm mới
+        viewedProducts = viewedProducts.filter(p => p.id !== product.id);
+    
+        // Thêm sản phẩm mới lên đầu danh sách
+        viewedProducts.unshift(product);
+    
+        // Giới hạn số lượng sản phẩm lưu (ví dụ: chỉ lưu 5 sản phẩm gần nhất)
+        if (viewedProducts.length > 5) {
+            viewedProducts.pop();
+        }
+    
+        localStorage.setItem("viewedProducts", JSON.stringify(viewedProducts));
     }
+    
     return (
-        <div className="bg-gray-50">
-            <div className="container mx-auto px-4 xl:px-10 py-8 bg-white rounded-lg">
-                <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">Sản phẩm liên quan</h2>
-                <Slider {...settings}>
-                    {relatedProducts && relatedProducts.length > 0 &&
+        <div className="bg-gray-50 ">
+            <div className="">
+                {
+                    relatedProducts.length > 3 && (
+                        <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">Sản phẩm liên quan</h2>
+                    )
+                }
+                <Slider {...settings} className="" >
+                    {relatedProducts && relatedProducts.length > 3 &&
                         relatedProducts.map((product, index) => (
                             <div key={index} className="p-2"                                         
                             onMouseEnter={() => setHoveredProduct(product.id)}
@@ -103,7 +122,7 @@ function Related_Product({ relatedProducts, setId_product }) {
                                     </button>
                                     <a
                                         href={`/product/${encodeURIComponent(product.product_name)}`}
-                                        onClick={() => handleProduct(product.id, product.product_name)}
+                                        onClick={() => handleProduct(product.id, product.product_name, product)}
                                         className="block"
                                     >
                                         <div className="h-[250px] mt-5 flex items-center justify-center p-4 bg-gray-50 relative">
@@ -150,7 +169,6 @@ function Related_Product({ relatedProducts, setId_product }) {
                                     </a>
                                 </div>
                             </div>
-
                         )) 
                     }
                 </Slider>

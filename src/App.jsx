@@ -19,6 +19,16 @@ import Register from "./Component/Auth/Register";
 import Top from "./Component/Top/Top";
 import DefaultLayout from "./page/Profile/Layout/DefaultLayout";
 import Footer from "./Component/Footer/Footer";
+import Chat from "./page/Chat/Chat";
+import { ChatProvider } from "./Context/ChatContext";
+import { ForgotProvider } from "./Context/ForgotPassword";
+import ForgotPassword from "./Component/Auth/ForgotPassword";
+import Product_By_Category from "./page/Product/Product_By/Product_By_Category";
+import Product_By_Brand from "./page/Product/Product_By/Product_By_Brand";
+import { SearchProductProvider } from "./Context/SearchContext";
+import ProductSearch from "./page/Product/Search/ProductSearch";
+import { CommentProvider } from "./Context/CommentContext";
+import { RatingProvider } from "./Context/RatingContext";
 
 
 function App() {
@@ -38,40 +48,55 @@ function App() {
       }, []);
     return (
         <Router>
-            <UserProvider>
-                <CartProvider>
-                    <ProductProvider>
-                        <DataProvider>
-                            <GetProductCategoryProvider>
-                                <GetProductBrandProvider>
-                                    <NavBar/>
-                                    <Header/>
-                                    <Top/>
-                                    <Routes>
-                                        <Route path="/login" element={<Login setCurrentTitle={setCurrentTitle}/>}/>
-                                        <Route path="/register" element={<Register setCurrentTitle={setCurrentTitle}/>} />
-                                        <Route path="/profiles" element={<DefaultLayout/>}>
-                                            {smember.map((route, index) => (
-                                                <Route key={index} path={route.path} element={<route.Component setCurrentTitle={setCurrentTitle}/> } />
-                                            ))}
-                                        </Route>
-                                        {
-                                            menu.map((item, index) => (
-                                                <Route
-                                                    key={index}
-                                                    path={item.path}
-                                                    element={<item.Component setCurrentTitle={setCurrentTitle}/>}
-                                                />
-                                            ))
-                                        }
-                                    </Routes>
-                                    <Footer/>
-                                </GetProductBrandProvider>
-                            </GetProductCategoryProvider>
-                        </DataProvider>
-                    </ProductProvider>
-                </CartProvider>
-            </UserProvider>
+            <ForgotProvider>
+            <RatingProvider>
+                <UserProvider>
+                    <ChatProvider>
+                        <CartProvider>
+                            <ProductProvider>
+                                <CommentProvider>
+                                <SearchProductProvider>
+                                    <DataProvider>
+                                        <GetProductCategoryProvider>
+                                            <GetProductBrandProvider>
+                                                <NavBar/>
+                                                <Header/>
+                                                <Top/>
+                                                <Chat/>
+                                                <Routes>
+                                                    <Route path="/search" element={<ProductSearch setCurrentTitle={setCurrentTitle}/>} />
+                                                    <Route path="/product-brand/:brand_name" element={<Product_By_Brand setCurrentTitle={setCurrentTitle} />} />
+                                                    <Route path="/product-category/:category_name" element={<Product_By_Category setCurrentTitle={setCurrentTitle} />} />
+                                                    <Route path="/forgot-password/:token" element={<ForgotPassword setCurrentTitle={setCurrentTitle}/>}/>
+                                                    <Route path="/login" element={<Login setCurrentTitle={setCurrentTitle}/>}/>
+                                                    <Route path="/register" element={<Register setCurrentTitle={setCurrentTitle}/>} />
+                                                    <Route path="/profiles" element={<DefaultLayout/>}>
+                                                        {smember.map((route, index) => (
+                                                            <Route key={index} path={route.path} element={<route.Component setCurrentTitle={setCurrentTitle}/> } />
+                                                        ))}
+                                                    </Route>
+                                                    {
+                                                        menu.map((item, index) => (
+                                                            <Route
+                                                                key={index}
+                                                                path={item.path}
+                                                                element={<item.Component setCurrentTitle={setCurrentTitle}/>}
+                                                            />
+                                                        ))
+                                                    }
+                                                </Routes>
+                                                <Footer/>
+                                            </GetProductBrandProvider>
+                                        </GetProductCategoryProvider>
+                                    </DataProvider>
+                                </SearchProductProvider>
+                                </CommentProvider>
+                            </ProductProvider>
+                        </CartProvider>
+                    </ChatProvider>
+                </UserProvider>
+                </RatingProvider>
+            </ForgotProvider>
             <ToastContainer
                 position="top-center"
                 autoClose={1500}

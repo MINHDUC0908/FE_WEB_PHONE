@@ -1,33 +1,44 @@
 import React, { useEffect, useMemo, useState } from "react";
-
-import { FaRegTrashCan } from "react-icons/fa6";
+import { FaArrowLeft, FaRegTrashCan } from "react-icons/fa6";
 import { HiPlus } from "react-icons/hi2";
 import { HiMinus } from "react-icons/hi2";
-import { IoGiftOutline } from "react-icons/io5";
-import { FiTag } from "react-icons/fi";
 import { toast } from "react-toastify";
-import { Link } from "react-router-dom";
 import axios from "axios";
 import { CartData } from "../../Context/CartContext";
 import { api, src } from "../../Api";
+import FooterProduct from "../Product/FooterProduct";
+import { LazyLoadImage } from "react-lazy-load-image-component";
+import { FaShoppingCart } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 function ViewCart({setCurrentTitle}) {
-    const { cart, deleteCart, setCart } = CartData();
-    const [loading, setLoading] = useState(true);
+    const { cart, deleteCart, setCart, loading, calculateTotalDiscount, calculateTotal, totalToPay } = CartData();
     const token = localStorage.getItem('token');
     const [modal, setModal] = useState(false);
     const [deleteId, setDeleteId] = useState(null);
-    console.log(cart);
-    const calculateTotal = useMemo(() => {
-        return cart
-            .filter(item => item.selected === 1)
-            .reduce((total, item) => {
-                return total + item.quantity * item.price;
-            }, 0);
-    }, [cart]);
-    
+    const navigate = useNavigate()
+    const [loaded, setLoaded] = useState(false);
+
+    console.log("Tổng tiền:", calculateTotal);
+    console.log("Tổng khuyến mãi:", calculateTotalDiscount);
+    console.log("Cần thanh toán:", totalToPay);
+
+    const [cartReady, setCartReady] = useState(false);
+    useEffect(() => {
+        if (!loading && cart) {
+            // Đợi một khoảng thời gian ngắn để đảm bảo dữ liệu đã được cập nhật đầy đủ
+            const timer = setTimeout(() => {
+            setCartReady(true);
+            }, 200);
+            
+            return () => clearTimeout(timer);
+        } else {
+            setCartReady(false);
+        }
+    }, [loading, cart]);
     useEffect(() => {
         setCurrentTitle('Giỏ hàng của bạn');
+        window.scrollTo(0, 0);
     }, [setCurrentTitle]);
     const Delete = async (id) => {
         try {
@@ -56,7 +67,7 @@ function ViewCart({setCurrentTitle}) {
             );
     
             if (res && res.data) {
-                console.log('Cập nhật thành công:', res.data.message);
+                toast.success(res.data.message);
                 setCart((prevCart) =>
                     prevCart.map((item) =>
                         item.id === id ? { ...item, selected: selected ? 1 : 0 } : item
@@ -68,7 +79,7 @@ function ViewCart({setCurrentTitle}) {
         }
     };
     // Kiểm tra nếu có ít nhất một sản phẩm được chọn
-    const hasSelectedItems = cart.some(item => item.selected === 1);
+    const hasSelectedItems = cart?.some(item => item.selected === 1);
     const handleSelectAll = async (e) => {
         const isChecked = e.target.checked;
     
@@ -138,7 +149,7 @@ function ViewCart({setCurrentTitle}) {
     };
     
 
-    const firstCartId = cart[0]?.cart_id;
+    const firstCartId = cart && cart.length > 0 ? cart[0].cart_id : null;
     const deleteAll = async (id) => {
         try {
             await axios.delete(api + `deleteAll/${id}`, 
@@ -197,15 +208,7 @@ function ViewCart({setCurrentTitle}) {
             setDeleteId(null); // Xóa trạng thái lưu ID
         }
     }
-    useEffect(() => {
-        const timeout = setTimeout(() => {
-            setLoading(false);
-        }, 1500);
-
-        return () => clearTimeout(timeout);
-    }, []);
-
-    if (loading) {
+    if (loading || !cartReady) {
         return (
             <div className="fixed inset-0 z-50 flex items-center justify-center">
                 <div className="absolute inset-0 bg-black bg-opacity-50 backdrop-blur-sm animate-fade-in"></div>
@@ -219,14 +222,33 @@ function ViewCart({setCurrentTitle}) {
     }
     return (
         <>
-            <div className="bg-gray-100 py-3">
+            <div className="bg-gray-50 py-4 border-b border-gray-200">
                 <div className="container mx-auto 2xl:px-28 px-4 xl:px-10">
-                    <div className="text-sm text-gray-600">Giỏ hàng của bạn</div>
+                    <div className="text-sm font-medium text-gray-700">Giỏ hàng của bạn</div>
                 </div>
             </div>
+
+            {!loading && cart?.length === 0 && (
+                <div className="container mx-auto 2xl:px-28 px-4 xl:px-10 ">
+                    <div className="flex flex-col items-center justify-center p-10 bg-white rounded-xl shadow-sm  max-w-2xl mx-auto">
+                    <div className="bg-blue-50 p-6 rounded-full mb-6">
+                        <FaShoppingCart className="text-blue-500 text-5xl" />
+                    </div>
+                    <p className="text-gray-800 text-xl font-semibold mb-2">Giỏ hàng của bạn đang trống!</p>
+                    <p className="text-gray-500 mb-8 text-center">Bạn chưa có sản phẩm nào trong giỏ hàng. Hãy thêm sản phẩm để tiếp tục.</p>
+                    <button
+                        onClick={() => navigate("/product")}
+                        className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-6 rounded-lg transition-all duration-200 shadow-sm"
+                    >
+                        <FaArrowLeft className="text-sm" />
+                        Tiếp tục mua sắm
+                    </button>
+                    </div>
+                </div>
+            )}
             <div className="">
                 <div className="container mx-auto 2xl:px-28 px-4 xl:px-10 mb-24">
-                    { cart.length > 0 ? (
+                    { cart.length > 0 && (
                         <div>
                             <div className="grid grid-cols-1 xl:grid-cols-3">
                                 <div className="col-span-1 xl:col-span-2">
@@ -259,51 +281,106 @@ function ViewCart({setCurrentTitle}) {
                                                                     onChange={(e) => updateOrder(item.id, token, e.target.checked)} // Gửi trạng thái khi thay đổi
                                                                 />
                                                             </div>
-                                                            <div>
-                                                                <img
-                                                                    src={src + `imgProduct/${item.product.images}`}
-                                                                    alt={item.product.product_name}
-                                                                    className="sm:h-[100px] h-[50px] w-full object-cover border border-gray-300 rounded-lg"
+                                                            <div className="h-16 w-16 relative">
+                                                                <LazyLoadImage
+                                                                    src={`${src}storage/${item.product.thumbnail}`}
+                                                                    alt="" 
+                                                                    className={`absolute top-0 left-0 w-full h-full object-contain transition-opacity duration-500 ${loaded ? 'opacity-0' : 'opacity-100'}`}
+                                                                    loading="lazy"
+                                                                />
+                                                                <LazyLoadImage
+                                                                    src={loaded ? `${src}imgProduct/${item.product.images}` : `${src}storage/${item.product.thumbnail}`}  // Ảnh chính thay thế ảnh mờ khi tải xong
+                                                                    alt={item.product.product_name}  
+                                                                    className={`w-full h-full object-contain transition-opacity duration-500 transform ${loaded ? 'opacity-100 scale-100' : 'opacity-0 scale-90'}`} 
+                                                                    onLoad={() => setLoaded(true)}  
+                                                                    loading="lazy"
+                                                                    aria-hidden={!loaded} 
                                                                 />
                                                             </div>
                                                         </div>
                                                         <div className="flex justify-between items-center w-full">
                                                             <div className="flex flex-col gap-1 sm:gap-4 ml-4">
                                                                 <div>
-                                                                <span className="text-[12px] sm:text-lg line-clamp-2">
+                                                                <span className="text-[12px] sm:text-sm line-clamp-2">
                                                                     {item.product.product_name}
                                                                 </span>
                                                                 </div>
                                                                 <div>
-                                                                    {item.colors?.color && (
-                                                                        <span className="bg-gray-300 px-2 py-1 sm:px-4 sm:py-2 text-[10px] sm:text-lg rounded-lg" style={{ color: item.colors.color }}>
+                                                                    {item.colors?.color ? (
+                                                                        <span className="inline-flex items-center  rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                                                            <span 
+                                                                                className="w-3 h-3 rounded-full mr-1.5" 
+                                                                                style={{ backgroundColor: item.colors.color }}
+                                                                            ></span>
                                                                             {item.colors.color}
+                                                                        </span>
+                                                                    ) : <span>-</span>}
+                                                                </div>
+                                                                <div className="text-[10px] text-gray-700 block sm:hidden">
+                                                                    {item.product.discount ? (
+                                                                        <>
+                                                                            <span className="text-red-500 font-semibold ">
+                                                                                {new Intl.NumberFormat('vi-VN', {
+                                                                                    style: 'currency',
+                                                                                    currency: 'VND',
+                                                                                }).format(
+                                                                                    item.product.price * (1 - item.product.discount.discount_value / 100)
+                                                                                )}
+                                                                            </span>
+                                                                            <span className="line-through text-gray-500 text-[10px] ml-2">
+                                                                                {new Intl.NumberFormat('vi-VN', {
+                                                                                    style: 'currency',
+                                                                                    currency: 'VND',
+                                                                                }).format(item.product.price)}
+                                                                            </span>
+                                                                        </>
+                                                                    ) : (
+                                                                        <span className="font-semibold">
+                                                                            {new Intl.NumberFormat('vi-VN', {
+                                                                                style: 'currency',
+                                                                                currency: 'VND',
+                                                                            }).format(item.product.price)}
                                                                         </span>
                                                                     )}
                                                                 </div>
-                                                                <div className="text-sm text-gray-700 block sm:hidden">
-                                                                    {new Intl.NumberFormat('vi-VN', {
-                                                                        style: 'currency',
-                                                                        currency: 'VND',
-                                                                    }).format(item.price)}
-                                                                </div>
                                                             </div>
                                                             <div className="sm:flex items-center gap-4"> 
-                                                                <div className="text-lg text-gray-700 hidden sm:block">
-                                                                    {new Intl.NumberFormat('vi-VN', {
-                                                                        style: 'currency',
-                                                                        currency: 'VND',
-                                                                    }).format(item.price)}
+                                                                <div className="hidden md:flex flex-col items-start space-y-1">
+                                                                    {item.product.discount ? (
+                                                                        <>
+                                                                            <span className="text-red-500 font-semibold">
+                                                                                {new Intl.NumberFormat('vi-VN', {
+                                                                                    style: 'currency',
+                                                                                    currency: 'VND',
+                                                                                }).format(
+                                                                                    item.product.price * (1 - item.product.discount.discount_value / 100)
+                                                                                )}
+                                                                            </span>
+                                                                            <span className="line-through text-gray-500 text-sm">
+                                                                                {new Intl.NumberFormat('vi-VN', {
+                                                                                    style: 'currency',
+                                                                                    currency: 'VND',
+                                                                                }).format(item.product.price)}
+                                                                            </span>
+                                                                        </>
+                                                                    ) : (
+                                                                        <span className="font-semibold">
+                                                                            {new Intl.NumberFormat('vi-VN', {
+                                                                                style: 'currency',
+                                                                                currency: 'VND',
+                                                                            }).format(item.product.price)}
+                                                                        </span>
+                                                                    )}
                                                                 </div>
                                                                 <div className="flex justify-end mb-6 sm:hidden">
                                                                     <button onClick={() => handleDelete(item.id)}>
-                                                                        <FaRegTrashCan className="cursor-pointer text-xl"/>
+                                                                        <FaRegTrashCan className="cursor-pointer text-sm"/>
                                                                     </button>
                                                                 </div>
                                                                 <div className="flex items-center gap-1">
                                                                     <button
                                                                         onClick={() => handleQuantityChange(-1, item)}
-                                                                        className="rounded-sm sm:px-2 sm:py-2 bg-gray-200 text-gray-700 sm:rounded-md hover:bg-gray-300 flex items-center justify-center"
+                                                                        className="rounded-sm sm:px-1 sm:py-1 bg-gray-200 text-gray-700 sm:rounded-md hover:bg-gray-300 flex items-center justify-center"
                                                                         disabled={item.quantity <= 1 || loading}
                                                                     >
                                                                         <HiMinus />
@@ -320,14 +397,14 @@ function ViewCart({setCurrentTitle}) {
                                                                     />
                                                                     <button
                                                                         onClick={() => handleQuantityChange(1, item)}
-                                                                        className="rounded-sm sm:px-2 sm:py-2 bg-gray-200 text-gray-700 sm:rounded-md hover:bg-gray-300 flex items-center justify-center"
+                                                                        className="rounded-sm sm:px-1 sm:py-1 bg-gray-200 text-gray-700 sm:rounded-md hover:bg-gray-300 flex items-center justify-center"
                                                                     >
                                                                         <HiPlus />
                                                                     </button>
                                                                 </div>
                                                                 <div className="hidden sm:block">
                                                                     <button onClick={() => handleShowModal(item.id)}>
-                                                                        <FaRegTrashCan className="cursor-pointer text-xl"/>
+                                                                        <FaRegTrashCan className="cursor-pointer text-lg"/>
                                                                     </button>
                                                                 </div>
                                                             </div>
@@ -339,27 +416,8 @@ function ViewCart({setCurrentTitle}) {
                                     </div>
                                 </div>
                                 <div className="col-span-1 xl:ml-5">
-                                    <div className="sticky right-0 top-0 max-h-screen">
-                                        <div className="flex items-center justify-between gap-4 bg-gray-100 px-4 py-3 mt-3 rounded-lg">
-                                            <div className="flex items-center gap-2">
-                                                <div>
-                                                    <IoGiftOutline className="text-xl"/>
-                                                </div>
-                                                <span>Quà tặng</span>
-                                            </div>
-                                        </div>
+                                    <div className="sticky right-0 top-5 max-h-screen">
                                         <div className="items-center justify-between gap-4 bg-gray-100 px-4 py-3 mt-3 rounded-lg">
-                                            <div className="flex justify-between items-center bg-white ">
-                                                <div className="flex items-center gap-2 py-3 rounded-lg pl-5">
-                                                    <div>
-                                                        <FiTag className="text-xl"/>
-                                                    </div>
-                                                    <span>Ưu đãi của sản phẩm</span>
-                                                </div>
-                                                <div className="pr-5">
-                                                    None
-                                                </div>
-                                            </div>
                                             <div className="mt-4">
                                                 <div>
                                                     <p className="text-lg font-semibold mb-3">
@@ -382,9 +440,9 @@ function ViewCart({setCurrentTitle}) {
                                                         </p>
                                                         <p className="text-lg">
                                                             {new Intl.NumberFormat('vi-VN', {
-                                                                                style: 'currency',
-                                                                                currency: 'VND',
-                                                            }).format(0)}
+                                                                style: 'currency',
+                                                                currency: 'VND',
+                                                            }).format(calculateTotalDiscount)}
                                                         </p>
                                                     </div>
                                                     <hr className="border-t-2 border-dashed border-gray-400 my-2"/>
@@ -396,21 +454,22 @@ function ViewCart({setCurrentTitle}) {
                                                             {new Intl.NumberFormat('vi-VN', {
                                                                                 style: 'currency',
                                                                                 currency: 'VND',
-                                                            }).format(calculateTotal)}
+                                                            }).format(totalToPay)}
                                                         </p>
                                                     </div>
                                                 </div>
-                                                <div className="text-center text-white text-lg bg-yellow-500 p-3 rounded-lg mt-5 hover:bg-yellow-600">
-                                                    <Link 
-                                                        to="/payment" 
-                                                        onClick={(e) => {
-                                                            if (!hasSelectedItems) {
-                                                                e.preventDefault();
-                                                                toast.warning('Vui lòng chọn ít nhất một sản phẩm để thanh toán.');
-                                                            }
-                                                        }}>
-                                                        Tiến hành thanh toán
-                                                    </Link>
+                                                <div 
+                                                    className="text-center text-white text-lg bg-yellow-500 p-3 rounded-lg mt-5 hover:bg-yellow-600 cursor-pointer"
+                                                    onClick={(e) => {
+                                                        if (!hasSelectedItems) {
+                                                            e.preventDefault();
+                                                            toast.warning('Vui lòng chọn ít nhất một sản phẩm để thanh toán.');
+                                                        } else {
+                                                            window.location.href = "/payment"; // Chuyển hướng nếu hợp lệ
+                                                        }
+                                                    }}
+                                                >
+                                                    Tiến hành thanh toán
                                                 </div>
                                             </div>
                                         </div>
@@ -418,20 +477,10 @@ function ViewCart({setCurrentTitle}) {
                                 </div>
                             </div>
                         </div>
-                    ) : (
-                        <div className="text-center py-6">
-                            <p className="text-lg text-gray-600">
-                                Giỏ hàng của bạn hiện tại trống.
-                            </p>
-                            <Link to={'/product'}>
-                                <button className="mt-4 bg-blue-500 text-white py-2 px-4 rounded">
-                                    Tiếp tục mua sắm
-                                </button>
-                            </Link>
-                        </div>
                     )}
                 </div>
             </div>
+            <FooterProduct />
             {modal && <ShowModal/>}
         </>
     );

@@ -24,9 +24,9 @@ function Header()
     const [isOpen, setIsOpen] = useState(false);
     const [isOpenS, setIsOpenS] = useState(false);
     const { category, groupedBrands, brand } = useData();
-    const {  setId } = useDataGetProduct();
+    const { setId } = useDataGetProduct();
     const { setId_brand} = useDataBanrd();
-    const {user} = UseDataUser();
+    const {user, loading } = UseDataUser();
 
     const handleMenuClick = (id) => {
         setActiveMenu(id);
@@ -41,12 +41,12 @@ function Header()
         if (category_name) {
             setId(id);
             console.log(category_name);
-            localStorage.setItem('id_category', id);
-            localStorage.setItem('category', category_name);
+            sessionStorage.setItem('id_category', id);
+            sessionStorage.setItem('category', category_name);
         } else {
             console.error('Category name is undefined or null');
-            localStorage.removeItem('id_brand');
-            localStorage.removeItem('brandData');
+            sessionStorage.removeItem('id_brand');
+            sessionStorage.removeItem('brandData');
         }
     }
     const handleBrand = (brand_id, brand_name, category_name, category_id) => {
@@ -55,13 +55,10 @@ function Header()
         
         if (brand_name) {
             setId_brand(brand_id);
-            localStorage.setItem('category', category_name)
-            localStorage.setItem('id_brand', brand_id);
-            localStorage.setItem('brandData', brand_name);
-            localStorage.setItem('id_category', category_id)
-        } else {
-            localStorage.removeItem('id_brand');
-            localStorage.removeItem('brandData');
+            sessionStorage.setItem('id_brand', brand_id);
+            sessionStorage.setItem('brandData', brand_name);
+            sessionStorage.setItem('id_category', category_id);
+            sessionStorage.setItem('category', category_name);
         }
     };
     const toggleSideBar = () => {
@@ -102,7 +99,7 @@ function Header()
                                                 groupedBrands[cat.id].map((brand) => (
                                                     <div key={brand.brand_id}>
                                                         <Link
-                                                            to={`product-category/brand/${brand.brand_name}`} 
+                                                            to={`product-brand/${brand.brand_name}`} 
                                                             onClick={() => {
                                                                 handleBrand(brand.brand_id, brand.brand_name, cat.category_name, cat.id);
                                                             }} 

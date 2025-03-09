@@ -4,11 +4,14 @@ import Banner from "./Component/Banner";
 import TopBar from "./Component/TopBar";
 import Product from "./Component/Product";
 import FooterProduct from "../Product/FooterProduct";
+import Evaluate from "./Component/Evaluate";
+import News from "./Component/News";
 
 
 function Home( {setCurrentTitle} )
 {
     useEffect(() => {
+        window.scrollTo(0, 0);
         setCurrentTitle("DUC COMPUTER")
     }, [setCurrentTitle])
     return (
@@ -25,6 +28,8 @@ function Home( {setCurrentTitle} )
                         <TopBar />
                         <Banner />
                         <Product/>
+                        <Evaluate/>
+                        <News/>
                     </div>
                 </div>
             </div>

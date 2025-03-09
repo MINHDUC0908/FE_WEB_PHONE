@@ -1,25 +1,37 @@
 import img from '../../assets/DUCCOMPUTER.png';
 import { TfiBag } from "react-icons/tfi";
 import { FaRegHeart } from "react-icons/fa";
-import { FaRegUser } from "react-icons/fa";
 import { useState } from "react";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { IoIosCloseCircle } from "react-icons/io";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useDataProduct } from '../../Context/ProductContext';
 import { UseDataUser } from '../../Context/UserContext';
 import { CartData } from '../../Context/CartContext';
+import { src } from '../../Api';
+import { LazyLoadImage } from 'react-lazy-load-image-component';
+import { useSearch } from '../../Context/SearchContext';
 
 function NavBar()
 {
+    const [loaded, setLoaded] = useState(false);
     const [wishlistCount, setWishlistCount] = useState(0);
-    const [search, setSearch] = useState("");
-    const [loading, setLoading] = useState(false);
+    const [isLoading, setLoading] = useState(false);
     const [results, setResults] = useState([]);
     const { products } = useDataProduct(); 
-    const {user} = UseDataUser();
+    const {user, loading} = UseDataUser();
     const {count} = CartData();
-
+    const { search, setSearch } = useSearch();
+    const  navigate = useNavigate();
+    const handleSearchSubmit = () => {
+        const query = search.trim();
+        
+        if (query.length > 2) {
+            navigate(`/search?q=${query}`);
+            setTimeout(() => setSearch(""), 100); // Xóa sau khi điều hướng
+        }
+    };
+    
     // Xóa kết quả tìm kiếm khi đóng
     const handleClose = () => {
         setSearch("");
@@ -44,7 +56,6 @@ function NavBar()
             setLoading(false);
         }, 300);
     };
-
     return (
         <>
             <div className="container mx-auto 2xl:px-28 px-4 xl:px-10">
@@ -64,18 +75,21 @@ function NavBar()
                             placeholder="Nhập sản phẩm tìm kiếm..."
                             value={search}
                             onChange={handleSearchChange}
+                            onKeyDown={(e) => e.key === "Enter" && handleSearchSubmit()}
                         />
-                        {search && !loading &&
+                        {search && !isLoading &&
                             <button onClick={handleClose}>
                                 <IoIosCloseCircle className='absolute right-24 top-3 cursor-pointer' />
                             </button>
                         }
-                        {loading && (
+                        {isLoading && (
                             <AiOutlineLoading3Quarters
                                 className="absolute top-3 right-24 animate-spin text-gray-600 transition-opacity duration-300 opacity-100"
                             />
                         )}
-                        <button className="bg-yellow-500 text-white px-2 py-2 hover:bg-yellow-600 transition duration-200 whitespace-nowrap">
+                        <button
+                            onClick={handleSearchSubmit}
+                            className="bg-yellow-500 text-white px-2 py-2 hover:bg-yellow-600 transition duration-200 whitespace-nowrap">
                             Tìm kiếm
                         </button>
                     </div>
@@ -106,30 +120,52 @@ function NavBar()
                                 to={user ? '/profiles/Delivery-history' : '/login'} 
                                 className='flex items-center relative'
                             >
-                                <FaRegUser className="text-2xl hover:text-yellow-600 transition duration-200" />
-                                {
-                                    user ? (
-                                        <div className="relative">
-                                            <span className="name ml-1 font-semibold hidden sm:block hover:text-yellow-600">
-                                                <span>
-                                                    {user.name.split(' ').length >= 2 
-                                                        ? user.name.split(' ').slice(-2).join(' ') 
-                                                        : user.name}
-                                                </span>
-                                            </span>
+                                {loading ? (
+                                        <div className='flex items-center'>
+                                            <div className="h-[30px] w-[30px] rounded-full flex items-center justify-center text-white font-semibold">
+                                                
+                                            </div>
+                                            <span className="relative ml-1 font-semibold hidden sm:block text-white">Đang tải..</span>
                                         </div>
-                                    ) : (
+                                ) : user ? (
+                                    <div className="flex items-center">
+                                        <div>
+                                            {user.image ? (
+                                                <LazyLoadImage
+                                                    loading="lazy"
+                                                    src={`${user.image.includes("http") ? user.image : src + "storage/imgCustomer/" + user.image}`}
+                                                    alt="User Avatar"
+                                                    className={`h-[30px] w-[30px] rounded-full object-cover transition-opacity duration-500 ${
+                                                        loaded ? "opacity-100" : "opacity-0"
+                                                    }`}
+                                                    onLoad={() => setLoaded(true)}
+                                                />
+                                            ) : (
+                                                <div className="h-[30px] w-[30px] rounded-full bg-blue-700 flex items-center justify-center text-white font-semibold">
+                                                    {user.name.charAt(0).toUpperCase()}
+                                                </div>
+                                            )}
+                                        </div>
+                                        <div className="relative ml-1 font-semibold hidden sm:block hover:text-yellow-600">
+                                            {user.name.split(' ').slice(-2).join(' ')}
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className='flex items-center'>
+                                        <div className="h-[30px] w-[30px] rounded-full bg-blue-700 flex items-center justify-center text-white font-semibold">
+                                            {user?.name ? user.name.charAt(0).toUpperCase() : "?"}
+                                        </div>
                                         <span className="ml-1 font-semibold hidden sm:block">Đăng nhập</span>
-                                    )
-                                }
+                                    </div>
+                                )}
                             </Link>
                         </div>
                     </div>
                 </div>
 
                 {/* Kết quả tìm kiếm trên màn hình lớn */}
-                {!loading && results.length > 0 && search && (
-                    <div className="hidden lg:block absolute lg:w-[370px] xl:w-[578px] 2xl:w-[690px] mx-auto left-11 right-24 max-h-[317px] top-[61px] bg-white border border-gray-300 z-10 transition-opacity duration-300 opacity-100 overflow-y-auto">
+                {!isLoading && results.length > 0 && search && (
+                    <div className="hidden lg:block absolute lg:w-[370px] xl:w-[578px] 2xl:w-[690px] mx-auto left-11 right-24 max-h-[265px] top-[61px] bg-white border border-gray-300 z-10 transition-opacity duration-300 opacity-100 overflow-y-auto">
                         {results.map(item => (
                             <div key={item.id} className="">
                                 <hr />
@@ -139,7 +175,7 @@ function NavBar()
                                             <img 
                                                 src={`http://127.0.0.1:8000/imgProduct/${item.images}`} 
                                                 alt={item.product_name} 
-                                                className="w-20 h-20 object-cover rounded-md"
+                                                className="w-16 h-16 object-cover rounded-md"
                                             />
                                         </div>
                                         <div className="flex flex-col justify-center pl-4">
@@ -167,19 +203,19 @@ function NavBar()
                         value={search}
                         onChange={handleSearchChange}
                     />
-                    {search && !loading &&
+                    {search && !isLoading &&
                         <button onClick={handleClose}>
                             <IoIosCloseCircle className='absolute right-24 top-3 cursor-pointer' />
                         </button>
                     }
-                    {loading && <AiOutlineLoading3Quarters className='absolute top-3 right-24 animate-spin text-gray-600' />}
+                    {isLoading && <AiOutlineLoading3Quarters className='absolute top-3 right-24 animate-spin text-gray-600' />}
                     <button className="bg-yellow-500 text-white px-2 py-2 hover:bg-yellow-600 transition duration-200 whitespace-nowrap">
                         Tìm kiếm
                     </button>
                 </div>
 
                 {/* Kết quả tìm kiếm cho phiên bản di động */}
-                {!loading && results.length > 0 && search && (
+                {!isLoading && results.length > 0 && search && (
                     <div className="lg:hidden block top-[52px] left-0 right-0  bg-white border border-gray-300 z-50 transition-opacity duration-300 opacity-100 max-h-[300px] overflow-y-auto shadow-md">
                         {results.map((item, index) => (
                             <div key={index} className="p-3 hover:bg-gray-100 cursor-pointer w-full">

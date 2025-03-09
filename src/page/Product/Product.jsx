@@ -1,55 +1,46 @@
 import { useEffect, useState } from "react";
-import { IoIosArrowUp, IoIosArrowDown } from "react-icons/io";
-import { motion, AnimatePresence } from "framer-motion";
-import { BiArrowToBottom, BiArrowFromBottom } from "react-icons/bi";
-import { HeartIcon, ShoppingCartIcon } from "lucide-react";
-import { useData } from "../../Context/DataContext";
+import { IoIosArrowDown } from "react-icons/io";
+import { motion } from "framer-motion";
+import { ShoppingCartIcon } from "lucide-react";
 import { useDataProduct } from "../../Context/ProductContext";
 import { src } from "../../Api";
 import { LazyLoadImage } from "react-lazy-load-image-component";
+import SiderBarProduct from "./Component/SidebarProduct";
+import SortProduct from "./Component/SortProduct";
 
 function Product({ setCurrentTitle }) {
-    const { category, groupedBrands } = useData();
-    const [open, setOpen] = useState(null);
-    const { products, setProducts, loading, error, setId_product, originalProducts } = useDataProduct();
-    const [sortby, setSortBy] = useState("");
-    const [sortField, setSortField] = useState("price");
-    const [hoveredProduct, setHoveredProduct] = useState(null);
-    const [loaded, setLoaded] = useState(false)
-
-    // Thiết lập tiêu đề trang
+    const {
+        products,
+        setProducts,
+        loading,
+        error,
+        setId_product,
+        originalProducts,
+    } = useDataProduct();
+    const [visibleProducts, setVisibleProducts] = useState(12);
+    const [loaded, setLoaded] = useState(false);
     useEffect(() => {
+        window.scrollTo(0, 0);
         setCurrentTitle("Cửa hàng - DUC COMPUTER");
     }, [setCurrentTitle]);
 
-    // Mở/đóng danh mục
-    const toggleCategory = (categoryName) => {
-        setOpen((prev) => (prev === categoryName ? null : categoryName));
-    };
-
     // Xử lý chọn sản phẩm
-    const handleProduct = (id, product_name) => {
-        localStorage.setItem("productShow", id);
-        localStorage.setItem("productShowName", product_name);
-        setId_product(id);
-    };
-
-    // Sắp xếp sản phẩm
-    const handleSort = (sortOrder, field) => {
-        setSortBy(sortOrder); // Lưu phương thức sắp xếp
-        setSortField(field); // Lưu trường sắp xếp
-
-        if (sortOrder === "default") {
-            setProducts(originalProducts);
-            return;
+    const handleProduct = (product) => {
+        setId_product(product.id);
+        let viewedProducts = JSON.parse(localStorage.getItem("viewedProducts")) || [];
+    
+        // Kiểm tra nếu sản phẩm đã tồn tại trong danh sách, thì xóa nó đi trước khi thêm mới
+        viewedProducts = viewedProducts.filter(p => p.id !== product.id);
+    
+        // Thêm sản phẩm mới lên đầu danh sách
+        viewedProducts.unshift(product);
+    
+        // Giới hạn số lượng sản phẩm lưu (ví dụ: chỉ lưu 5 sản phẩm gần nhất)
+        if (viewedProducts.length > 5) {
+            viewedProducts.pop();
         }
-        const sortedProducts = [...products].sort((a, b) => {
-            return sortOrder === 'asc' 
-                ? a[field] - b[field] 
-                : b[field] - a[field];
-        });
-
-        setProducts(sortedProducts);
+    
+        localStorage.setItem("viewedProducts", JSON.stringify(viewedProducts));
     };
 
     // Hiển thị loading
@@ -58,172 +49,139 @@ function Product({ setCurrentTitle }) {
             <div className="fixed inset-0 z-50 flex items-center justify-center">
                 <div className="absolute inset-0 bg-black bg-opacity-50 backdrop-blur-sm"></div>
                 <div className="relative rounded-lg shadow-2xl">
-                    <div className="flex justify-center mt-4">
-                        <div className="w-12 h-12 border-4 border-t-4 border-white border-t-blue-500 rounded-full animate-spin"></div>
-                    </div>
+                <div className="flex justify-center mt-4">
+                    <div className="w-12 h-12 border-4 border-t-4 border-white border-t-blue-500 rounded-full animate-spin"></div>
+                </div>
                 </div>
             </div>
         );
     }
-
-    // Hiển thị lỗi
     if (error) {
         return (
-            <div className="text-red-500 text-center py-10">
-                Lỗi tải dữ liệu
-            </div>
+            <div className="text-red-500 text-center py-10">Lỗi tải dữ liệu</div>
         );
     }
 
+    const displayedProducts = products.slice(0, visibleProducts);
+    const hasMoreProducts = visibleProducts < products.length;
+    const handleLoadMore = () => {
+        setVisibleProducts((prev) => prev + 4);
+    };
+    console.log(products);
     return (
         <>
-            {/* Header danh mục */}
+        {/* Header danh mục */}
             <div className="bg-gradient-to-r from-blue-50 to-blue-100 py-4">
                 <div className="container mx-auto 2xl:px-28 px-4 xl:px-10">
-                    <h1 className="text-black font-semibold">Sản phẩm</h1>
+                <h1 className="text-black font-semibold">Sản phẩm</h1>
                 </div>
             </div>
-
             <div className="container mx-auto 2xl:px-28 px-4 xl:px-10 py-8">
-                <div className="grid grid-cols-4 lg:grid-cols-5 gap-6">
-                    {/* Sidebar danh mục */}
-                    <div className="col-span-1 bg-white rounded-xl shadow-md border border-gray-100 p-4 hidden lg:block">
-                        <h2 className="text-lg font-semibold text-blue-800 mb-4">Danh mục</h2>
-                        {category.map((cate) => (
-                            <div key={cate.id} className="mb-2">
-                                <div
-                                    className="cursor-pointer flex justify-between items-center p-2 rounded-lg hover:bg-blue-50 transition"
-                                    onClick={() => toggleCategory(cate.category_name)}
-                                >
-                                    <span className="text-gray-700 font-medium">
-                                        {cate.category_name}
-                                    </span>
-                                    {groupedBrands[cate.id]?.length > 0 && (
-                                        <motion.div
-                                            initial={{ rotate: 0 }}
-                                            animate={{ rotate: open === cate.category_name ? 180 : 0 }} // Xoay icon khi mở
-                                            transition={{ duration: 0.3 }}
-                                        >
-                                            <IoIosArrowDown className={open === cate.category_name ? "text-blue-500" : "text-gray-400"} />
-                                        </motion.div>
-                                    )}
-                                </div>
-                                <AnimatePresence>
-                                    {open === cate.category_name && (
-                                        <motion.div
-                                            initial={{ opacity: 0, height: 0 }}
-                                            animate={{ opacity: 1, height: "auto" }}
-                                            exit={{ opacity: 0, height: 0 }}
-                                            transition={{
-                                                duration: Math.min(0.5 + (groupedBrands[cate.id]?.length || 0) * 0.1, 1.5), // Điều chỉnh thời gian dựa trên số lượng brand
-                                            }}
-                                            className="pl-4"
-                                        >
-                                            {groupedBrands[cate.id]?.map((brand) => (
-                                                <div
-                                                    key={brand.brand_id}
-                                                    className="pl-4 py-1 text-sm text-gray-600 hover:text-gray-800 font-sans"
-                                                >
-                                                    {brand.brand_name}
-                                                </div>
-                                            ))}
-                                        </motion.div>
-                                    )}
-                                </AnimatePresence>
-                            </div>
-                        ))}
-                    </div>
+                <div className="grid grid-cols-4 lg:grid-cols-8 gap-6">
+                {/* Sidebar danh mục */}
+                    <SiderBarProduct setProducts={setProducts} originalProducts={originalProducts} products={products} />
 
                     {/* Nội dung sản phẩm */}
-                    <div className="col-span-4 lg:col-span-4">
+                    <div className="col-span-4 lg:col-span-6">
                         {/* Các nút sắp xếp */}
-                        <div className="mb-6 bg-white rounded-xl shadow-md border border-blue-100 p-4 flex items-center">
-                            <p className="text-lg font-semibold text-blue-800 ">
-                                Sắp xếp theo
-                            </p>
-                            <div className="flex items-center ml-auto">
-                                <select 
-                                    className="px-4 py-2 border rounded-md text-blue-800 font-medium" 
-                                    onChange={(e) => {
-                                        const value = e.target.value;
-                                        if (value === "asc") handleSort("asc", "price");
-                                        else if (value === "desc") handleSort("desc", "price")
-                                        else handleSort("default", "");
-                                    }}
-                                >
-                                    <option value="">Thứ tự mặc định</option>
-                                    <option value="asc">Thứ tự theo giá: Giá Thấp - Cao</option>
-                                    <option value="desc">Thứ tự theo giá: Giá Cao - Thấp</option>
-                                </select>
-                            </div>
-                        </div>
-
+                        <SortProduct setProducts={setProducts} originalProducts={originalProducts}/>
 
                         {/* Lưới sản phẩm */}
-                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                            {products.length > 0 ? (
-                                products.map(product => (
-                                    <motion.div 
-                                        key={product.id} 
-                                        className="bg-white rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden group relative"
-                                        onMouseEnter={() => setHoveredProduct(product.id)}
-                                        onMouseLeave={() => setHoveredProduct(null)}
-                                        whileHover={{ scale: 1.02 }}
+                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 py-8">
+                            {displayedProducts.length > 0 ? (
+                                displayedProducts.map((product) => (
+                                    <motion.div
+                                        key={product.id}
+                                        className="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden group"
+                                        whileHover={{ y: -5 }}
+                                        initial={{ opacity: 0 }}
+                                        animate={{ opacity: 1 }}
+                                        transition={{ duration: 0.3 }}
                                     >
-                                        {/* Nút yêu thích */}
-                                        <button className="absolute top-3 right-3 z-10 bg-white/70 rounded-full p-2 hover:bg-white hover:shadow-md transition-all">
-                                            <HeartIcon 
-                                                className={`w-5 h-5 ${
-                                                    hoveredProduct === product.id 
-                                                        ? 'text-red-500 fill-current' 
-                                                        : 'text-gray-400'
-                                                }`} 
-                                            />
-                                        </button>
-
                                         <a
                                             href={`/product/${encodeURIComponent(product.product_name)}`}
-                                            onClick={() => handleProduct(product.id, product.product_name)}
-                                            className="block"
+                                            onClick={() => handleProduct(product)}
+                                            className="block h-full"
                                         >
-                                            <div className="h-[250px] flex items-center justify-center p-4 bg-gray-50 relative">
-                                                {/* Ảnh mờ (thumbnail) */}
+                                            <div className="h-48 md:h-56 lg:h-64 relative overflow-hidden bg-gray-50">
                                                 <LazyLoadImage
-                                                    src={`${src}storage/${product.thumbnail}`}  // Ảnh thumbnail mờ
-                                                    alt=""  // Đặt alt rỗng để không hiển thị bất kỳ văn bản nào
-                                                    className={`absolute top-0 left-0 w-full h-full object-contain transition-opacity duration-500 ${loaded ? 'opacity-0' : 'opacity-100'}`}
-                                                    loading="lazy"  // Lazy load cho ảnh mờ
+                                                    src={`${src}storage/${product.thumbnail}`}
+                                                    alt=""
+                                                    className="absolute inset-0 w-full h-full object-contain opacity-10"
+                                                    loading="lazy"
                                                 />
-                                                {/* Ảnh chính */}
                                                 <LazyLoadImage
-                                                    src={loaded ? `${src}imgProduct/${product.images}` : `${src}storage/${product.thumbnail}`}  // Ảnh chính thay thế ảnh mờ khi tải xong
-                                                    alt={product.product_name}  // Alt chỉ hiện khi ảnh chính tải xong
-                                                    className={`w-full h-full object-contain transition-opacity duration-500 transform ${loaded ? 'opacity-100 scale-100' : 'opacity-0 scale-90'}`} 
-                                                    onLoad={() => setLoaded(true)}  // Khi ảnh chính tải xong, set loaded = true
-                                                    loading="lazy"  // Lazy load cho ảnh chính
-                                                    aria-hidden={!loaded}  // Ẩn alt nếu ảnh chưa tải xong
+                                                    src={loaded ? `${src}imgProduct/${product.images}` : `${src}storage/${product.thumbnail}`}
+                                                    alt={product.product_name}
+                                                    className="w-full h-full object-contain transition-all duration-500"
+                                                    onLoad={() => setLoaded(true)}
+                                                    loading="lazy"
                                                 />
+                                                
+                                                {/* Discount Badge */}
+                                                {product.discount && (
+                                                    <div className="absolute top-2 right-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">
+                                                        -{product.discount.discount_value}%
+                                                    </div>
+                                                )}
                                             </div>
-
                                             <div className="p-4">
-                                                <h3 
-                                                    className="text-blue-800 font-semibold mb-2 line-clamp-2 h-12"
-                                                >
+                                                <h3 className="text-gray-800 font-medium text-sm md:text-base mb-2 line-clamp-2 h-12 hover:text-blue-600 transition-colors">
                                                     {product.product_name}
                                                 </h3>
-                                                <div className="flex justify-between items-center">
-                                                    <p className="text-lg font-bold text-red-600">
+                                                <div className="mt-2">
+                                                    {product.discount ? (
+                                                        <div className="flex items-baseline gap-2">
+                                                        <span className="text-lg font-bold text-red-600">
+                                                            {new Intl.NumberFormat("vi-VN", {
+                                                            style: "currency",
+                                                            currency: "VND",
+                                                            }).format(product.price * (1 - product.discount.discount_value / 100))}
+                                                        </span>
+                                                        <span className="text-xs text-gray-400 line-through">
+                                                            {new Intl.NumberFormat("vi-VN", {
+                                                            style: "currency",
+                                                            currency: "VND",
+                                                            }).format(product.price)}
+                                                        </span>
+                                                        </div>
+                                                    ) : (
+                                                        <span className="text-lg font-bold text-gray-800">
                                                         {new Intl.NumberFormat("vi-VN", {
                                                             style: "currency",
                                                             currency: "VND",
                                                         }).format(product.price)}
-                                                    </p>
+                                                        </span>
+                                                    )}
+                                                </div>
+                                                <div className="mt-2 flex items-center justify-between">
+                                                    {product.time_left && (
+                                                        <div className="flex items-center text-xs text-red-500 bg-red-50 rounded px-2 py-1">
+                                                            <svg 
+                                                                xmlns="http://www.w3.org/2000/svg" 
+                                                                fill="none" 
+                                                                viewBox="0 0 24 24" 
+                                                                strokeWidth={2} 
+                                                                stroke="currentColor" 
+                                                                className="w-4 h-4 mr-1"
+                                                            >
+                                                                <path 
+                                                                    strokeLinecap="round" 
+                                                                    strokeLinejoin="round" 
+                                                                    d="M12 6v6l4 2m6-4A10 10 0 11.68 5.08 10 10 0 0122 12z" 
+                                                                />
+                                                            </svg>
+                                                            {product.time_left}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                <div className="mt-4 flex justify-between items-center">
+                                                    <span className="text-xs text-green-400">
+                                                        {product.discount ? 'Đang giảm giá' : ''}
+                                                    </span>
                                                     <button 
-                                                        className={`p-2 rounded-full transition-all ${
-                                                            hoveredProduct === product.id 
-                                                                ? 'bg-blue-500 text-white shadow-md' 
-                                                                : 'bg-gray-200 text-gray-500'
-                                                        }`}
+                                                        className="p-2 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white transition-all duration-300 flex items-center justify-center"
+                                                        aria-label="Thêm vào giỏ hàng"
                                                     >
                                                         <ShoppingCartIcon className="w-5 h-5" />
                                                     </button>
@@ -233,11 +191,28 @@ function Product({ setCurrentTitle }) {
                                     </motion.div>
                                 ))
                             ) : (
-                                <div className="col-span-full text-center text-gray-500 py-10">
-                                    Không có sản phẩm nào
+                                <div className="col-span-full flex flex-col items-center justify-center py-16 text-gray-500">
+                                <svg className="w-16 h-16 text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                                </svg>
+                                <p className="text-lg font-medium">Không có sản phẩm nào</p>
+                                <p className="text-sm mt-2">Vui lòng thử lại với bộ lọc khác</p>
                                 </div>
                             )}
-                        </div>
+                            </div>
+                        {hasMoreProducts && (
+                            <div className="flex justify-center mt-6">
+                                <button
+                                    onClick={handleLoadMore}
+                                    className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg text-sm 
+                                                text-gray-700 bg-white hover:bg-gray-100 transition-all duration-200 shadow-sm 
+                                                hover:shadow-md active:scale-95"
+                                >
+                                <IoIosArrowDown className="text-gray-500 text-lg" />
+                                Xem thêm sản phẩm {products.length - visibleProducts}
+                                </button>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>

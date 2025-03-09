@@ -2,66 +2,59 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import img from "../../assets/ai.png";
 import { Link, useLocation } from "react-router-dom";
-import { api } from "../../Api";
+import { api, formatTimeAgo, src } from "../../Api";
 
 function ShowNew() {
-    const [showNew, setShowNew] = useState(null); 
-    const [news, setNews] = useState([]); 
+    const [showNew, setShowNew] = useState(null);
+    const [news, setNews] = useState([]);
+    const [loadingShowNew, setLoadingShowNew] = useState(true);
+    const [loadingNews, setLoadingNews] = useState(true);
     const [font, setFont] = useState(false);
-    const [loading, setLoading] = useState(true); 
+
     const location = useLocation();
     const id = location.state?.id;
 
-    const fetchShowNew = async (id) => {
+    useEffect(() => {
+        window.scrollTo(0, 0);
+
         if (!id) {
             console.error("Không tìm thấy id từ location.state");
-            setLoading(false);
+            setLoadingShowNew(false);
             return;
         }
-        try {
-            const result = await axios.get(api + `show/${id}`);
-            setShowNew(result.data.data || null);
-        } catch (error) {
-            console.error("Lỗi khi gọi API chi tiết bài viết:", error);
-        } finally {
-            setLoading(false);
-        }
-    };
 
-    const fetchNew = async () => {
-        try {
-            const result = await axios.get(api + `new`);
-            setNews(result.data.data || []);
-        } catch (error) {
-            console.error("Lỗi khi gọi API danh sách bài viết:", error);
-        }
-    };
+        const fetchShowNew = async () => {
+            try {
+                setLoadingShowNew(true);
+                const result = await axios.get(api + `show/${id}`);
+                setShowNew(result.data.data || null);
+            } catch (error) {
+                console.error("Lỗi khi gọi API chi tiết bài viết:", error);
+            } finally {
+                setLoadingShowNew(false);
+            }
+        };
 
-    const formatTimeAgo = (timestamp) => {
-        const date = new Date(timestamp);
-        const now = new Date();
-        const diffInSeconds = Math.floor((now - date) / 1000);
-        const diffInMinutes = Math.floor(diffInSeconds / 60);
-        const diffInHours = Math.floor(diffInMinutes / 60);
-        const diffInDays = Math.floor(diffInHours / 24);
-
-        if (diffInDays > 0) {
-            return `${diffInDays} ngày trước`;
-        } else if (diffInHours > 0) {
-            return `${diffInHours} giờ trước`;
-        } else if (diffInMinutes > 0) {
-            return `${diffInMinutes} phút trước`;
-        } else {
-            return "Vừa xong";
-        }
-    };
-
-    useEffect(() => {
-        fetchShowNew(id);
-        fetchNew();
+        fetchShowNew();
     }, [id]);
 
-    if (loading) {
+    useEffect(() => {
+        const fetchNew = async () => {
+            try {
+                setLoadingNews(true);
+                const result = await axios.get(api + `new`);
+                setNews(result.data.data || []);
+            } catch (error) {
+                console.error("Lỗi khi gọi API danh sách bài viết:", error);
+            } finally {
+                setLoadingNews(false);
+            }
+        };
+
+        fetchNew();
+    }, []);
+
+    if (loadingShowNew) {
         return (
             <div className="fixed inset-0 z-50 flex items-center justify-center">
                 <div className="absolute inset-0 bg-black bg-opacity-50 backdrop-blur-sm animate-fade-in"></div>
@@ -82,7 +75,7 @@ function ShowNew() {
         <div className="container mx-auto 2xl:px-28 px-4 xl:px-10 my-10">
             <div className="grid grid-cols-2 gap-20">
                 <div>
-                    <img src={`https://duc-phone.onrender.com/imgnew/${showNew.images}`} alt={showNew.title} />
+                    <img src={src + `imgnew/${showNew.images}`} alt={showNew.title} />
                 </div>
                 <div>
                     <div className="flex items-center mb-5">
@@ -145,7 +138,7 @@ function ShowNew() {
                                 <div className="grid grid-cols-4 gap-4 p-4">
                                     <div className="flex justify-center items-center">
                                         <img
-                                            src={`https://duc-phone.onrender.com/imgnew/${item.images}`}
+                                            src={src + `imgnew/${item.images}`}
                                             alt={item.title}
                                             className="rounded-lg w-full h-auto"
                                         />
