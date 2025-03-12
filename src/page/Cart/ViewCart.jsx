@@ -8,8 +8,9 @@ import { CartData } from "../../Context/CartContext";
 import { api, src } from "../../Api";
 import FooterProduct from "../Product/FooterProduct";
 import { LazyLoadImage } from "react-lazy-load-image-component";
-import { FaShoppingCart } from "react-icons/fa";
+import { FaShoppingBag, FaShoppingCart } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import { AlertCircle, Trash2, X } from "lucide-react";
 
 function ViewCart({setCurrentTitle}) {
     const { cart, deleteCart, setCart, loading, calculateTotalDiscount, calculateTotal, totalToPay } = CartData();
@@ -18,7 +19,10 @@ function ViewCart({setCurrentTitle}) {
     const [deleteId, setDeleteId] = useState(null);
     const navigate = useNavigate()
     const [loaded, setLoaded] = useState(false);
-
+    const [loadedImages, setLoadedImages] = useState({});
+    const handleImageLoad = (id) => {
+        setLoadedImages((prev) => ({ ...prev, [id]: true }));
+    };
     console.log("Tổng tiền:", calculateTotal);
     console.log("Tổng khuyến mãi:", calculateTotalDiscount);
     console.log("Cần thanh toán:", totalToPay);
@@ -168,28 +172,47 @@ function ViewCart({setCurrentTitle}) {
     const ShowModal = () => {
         return (
             <div className="fixed inset-0 z-50 flex items-center justify-center">
-                <div>
-                    <div className="absolute inset-0 bg-black bg-opacity-50"></div>
-                </div>
-                <div className="relative bg-white w-full max-w-sm rounded-sm" style={{ animation: 'fadeIn 0.5s forwards' }}>
-                    <div className="rounded-lg w-96 p-6">
-                        <h3 className="text-center text-lg font-semibold mb-4">
-                        Bạn muốn xoá sản phẩm này
-                                ra khỏi giỏ hàng?
-                        </h3>
-                        <div className="flex justify-between">
-                        <button
-                            className="bg-gray-300 text-black w-[160px] py-2 rounded-lg font-medium hover:bg-gray-400"
+                <div className="absolute inset-0 bg-black bg-opacity-60 backdrop-blur-sm"></div>
+                <div 
+                    className="relative bg-gradient-to-b from-white to-gray-50 w-full max-w-md rounded-xl shadow-2xl overflow-hidden border border-gray-100"
+                    style={{ animation: 'fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards' }}
+                >
+                    <div className="h-1 bg-gradient-to-r from-red-500 via-red-400 to-red-500"></div>
+                        <button 
+                            className="absolute top-4 right-4 text-gray-400 hover:text-gray-700 transition-colors duration-300 p-1 rounded-full hover:bg-gray-100"
                             onClick={() => setModal(false)}
                         >
-                            Không
+                            <X size={18} />
                         </button>
-                        <button
-                            className="bg-red-600 text-white w-[160px] py-2 rounded-lg font-medium hover:bg-red-700"
-                            onClick={handleDelete}
-                        >
-                            Xác nhận
-                        </button>
+                        <div className="p-8">
+                            <div className="flex justify-center mb-6">
+                                <div className="bg-red-50 p-4 rounded-full shadow-sm border border-red-100">
+                                    <Trash2 size={36} className="text-red-500" />
+                                </div>
+                            </div>
+                            <h3 className="text-center text-xl font-semibold text-gray-800 mb-2">
+                                Xoá sản phẩm
+                            </h3>
+                            <div className="flex items-center justify-center gap-2 mb-8 text-gray-600">
+                                <p className="text-center">
+                                Bạn muốn xoá sản phẩm này ra khỏi giỏ hàng?
+                                </p>
+                            </div>
+            
+                            <div className="flex justify-between gap-4">
+                                <button
+                                    className="flex-1 bg-white text-gray-700 py-3 px-4 rounded-lg font-medium border border-gray-200 hover:bg-gray-50 hover:border-gray-300 transition-all duration-300 shadow-sm"
+                                    onClick={() => setModal(false)}
+                                >
+                                    Không
+                                </button>
+                            <button
+                                className="flex-1 bg-gradient-to-r from-red-500 to-red-600 text-white py-3 px-4 rounded-lg font-medium hover:from-red-600 hover:to-red-700 transition-all duration-300 shadow-sm flex items-center justify-center gap-2"
+                                onClick={handleDelete}
+                            >
+                                <AlertCircle size={16} />
+                                Xác nhận
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -211,10 +234,11 @@ function ViewCart({setCurrentTitle}) {
     if (loading || !cartReady) {
         return (
             <div className="fixed inset-0 z-50 flex items-center justify-center">
-                <div className="absolute inset-0 bg-black bg-opacity-50 backdrop-blur-sm animate-fade-in"></div>
-                <div className="relative rounded-lg shadow-2xl animate-bounce-in">
-                    <div className="flex justify-center mt-4">
-                        <div className="w-12 h-12 border-4 border-t-4 border-white border-t-blue-500 rounded-full animate-spin"></div>
+                <div className="absolute inset-0 bg-black bg-opacity-20 backdrop-blur-sm animate-fade-in"></div>
+                <div className="relative">
+                    <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-500"></div>
+                    <div className="absolute top-0 left-0 right-0 bottom-0 flex items-center justify-center">
+                        <FaShoppingBag className="text-blue-500 text-lg" />
                     </div>
                 </div>
             </div>
@@ -283,18 +307,13 @@ function ViewCart({setCurrentTitle}) {
                                                             </div>
                                                             <div className="h-16 w-16 relative">
                                                                 <LazyLoadImage
-                                                                    src={`${src}storage/${item.product.thumbnail}`}
-                                                                    alt="" 
-                                                                    className={`absolute top-0 left-0 w-full h-full object-contain transition-opacity duration-500 ${loaded ? 'opacity-0' : 'opacity-100'}`}
+                                                                    src={`${src}imgProduct/${item.product.images}`}
+                                                                    alt={item.product.title}
+                                                                    className={`w-full h-full object-contain transition-all duration-500 ${
+                                                                        loadedImages[item.product.id] ? "opacity-100 scale-100" : "opacity-0 scale-95"
+                                                                    }`}
+                                                                    onLoad={() => handleImageLoad(item.product.id)}
                                                                     loading="lazy"
-                                                                />
-                                                                <LazyLoadImage
-                                                                    src={loaded ? `${src}imgProduct/${item.product.images}` : `${src}storage/${item.product.thumbnail}`}  // Ảnh chính thay thế ảnh mờ khi tải xong
-                                                                    alt={item.product.product_name}  
-                                                                    className={`w-full h-full object-contain transition-opacity duration-500 transform ${loaded ? 'opacity-100 scale-100' : 'opacity-0 scale-90'}`} 
-                                                                    onLoad={() => setLoaded(true)}  
-                                                                    loading="lazy"
-                                                                    aria-hidden={!loaded} 
                                                                 />
                                                             </div>
                                                         </div>
@@ -317,9 +336,9 @@ function ViewCart({setCurrentTitle}) {
                                                                     ) : <span>-</span>}
                                                                 </div>
                                                                 <div className="text-[10px] text-gray-700 block sm:hidden">
-                                                                    {item.product.discount ? (
+                                                                    {item.product.discount && new Date(item.product.discount.end_date) > new Date() ? (
                                                                         <>
-                                                                            <span className="text-red-500 font-semibold ">
+                                                                            <span className="text-red-500 font-semibold">
                                                                                 {new Intl.NumberFormat('vi-VN', {
                                                                                     style: 'currency',
                                                                                     currency: 'VND',
@@ -346,7 +365,7 @@ function ViewCart({setCurrentTitle}) {
                                                             </div>
                                                             <div className="sm:flex items-center gap-4"> 
                                                                 <div className="hidden md:flex flex-col items-start space-y-1">
-                                                                    {item.product.discount ? (
+                                                                    {item.product.discount && new Date(item.product.discount.end_date) > new Date() ? (
                                                                         <>
                                                                             <span className="text-red-500 font-semibold">
                                                                                 {new Intl.NumberFormat('vi-VN', {

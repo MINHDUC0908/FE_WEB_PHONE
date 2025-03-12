@@ -4,6 +4,7 @@ import { api, formatTimeAgo, src } from "../../../Api";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import { FaArrowRightLong, FaTags } from "react-icons/fa6";
 import { CiClock1 } from "react-icons/ci";
+import { Link } from "react-router-dom";
 
 function News() {
     const [news, setNews] = useState([]);
@@ -75,12 +76,13 @@ function News() {
                                     }}
                                 />
                                 <div className="mt-auto">
-                                    <a
-                                        href="#"
+                                    <Link
+                                        to={`/new/${item.title}`} 
+                                        state={{ id: item.id }} 
                                         className="inline-flex gap-2 items-center text-[16px] md:text-[18px] text-[#717171] font-montserrat transition-colors hover:text-black"
                                     >
                                         Đọc ngay <FaArrowRightLong className="ml-1" />
-                                    </a>
+                                    </Link>
                                 </div>
                             </div>
                         </div>
@@ -123,12 +125,13 @@ function News() {
                                 }}
                             />
                             <div className="mt-auto">
-                                <a
-                                    href="#"
+                                <Link
+                                    to={`/new/${news[2].title}`} 
+                                    state={{ id: news[2].id }} 
                                     className="inline-flex gap-2 items-center text-[16px] md:text-[18px] text-[#717171] font-montserrat transition-colors hover:text-black"
                                 >
                                     Đọc ngay <FaArrowRightLong className="ml-1" />
-                                </a>
+                                </Link>
                             </div>
                         </div>
                     </div>

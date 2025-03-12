@@ -139,16 +139,21 @@ export const CartProvider = ({ children }) => {
     }, [cart]);
     const calculateTotalDiscount = useMemo(() => {
         return cart?.length > 0
-            ?cart.filter(item => item.selected === 1) 
+            ? cart
+                .filter(item => item.selected === 1) // Chỉ tính cho sản phẩm được chọn
                 .reduce((total, item) => {
-                if (item.product.discount) {
-                    const discountAmount = item.product.price * (item.product.discount.discount_value / 100);
-                    return total + discountAmount * item.quantity;
-                }
-                return total;
-            }, 0)
+                    const discount = item.product.discount;
+                    const isDiscountValid = discount && new Date(discount.end_date) > new Date(); // Kiểm tra còn hạn
+    
+                    if (isDiscountValid) {
+                        const discountAmount = item.product.price * (discount.discount_value / 100);
+                        return total + discountAmount * item.quantity;
+                    }
+                    return total;
+                }, 0)
             : 0;
     }, [cart]);
+    
         // Tính tổng tiền khuyến mãi
     const totalToPay = Math.max(0, (calculateTotal || 0) - (calculateTotalDiscount || 0));
     return (

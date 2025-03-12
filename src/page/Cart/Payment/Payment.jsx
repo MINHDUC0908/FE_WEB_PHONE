@@ -9,6 +9,7 @@ import { CartData } from "../../../Context/CartContext";
 import { api, src } from "../../../Api";
 import cod from "../../../assets/checkout/cod.png";
 import vnPay from "../../../assets/checkout/vnpay.png";
+import { LazyLoadImage } from "react-lazy-load-image-component";
 
 function Payment({setCurrentTitle}) {
     const token = localStorage.getItem('token');
@@ -30,6 +31,10 @@ function Payment({setCurrentTitle}) {
     const navigate = useNavigate();
     const [cart, setCartPay] = useState([]);
     const [order, setOrder] = useState(false);
+    const [loadedImages, setLoadedImages] = useState({});
+    const handleImageLoad = (id) => {
+        setLoadedImages((prev) => ({ ...prev, [id]: true }));
+    };
     console.log(calculateTotalDiscount)
     const [selectedPayment, setSelectedPayment] = useState("cod"); // Mặc định là COD
     useEffect(() => {
@@ -534,10 +539,14 @@ function Payment({setCurrentTitle}) {
                                             <td className="py-4 px-4">
                                                 <div className="flex items-center gap-3">
                                                 <div className="w-16 h-16 rounded-md overflow-hidden flex-shrink-0 border border-gray-200">
-                                                    <img
-                                                    src={src + `imgProduct/${item.product.images}`}
-                                                    alt={item.product.product_name}
-                                                    className="h-full w-full object-cover hover:scale-105 transition-transform"
+                                                    <LazyLoadImage
+                                                        src={`${src}imgProduct/${item.product.images}`}
+                                                        alt={item.product.title}
+                                                        className={`w-full h-full object-contain transition-all duration-500 ${
+                                                            loadedImages[item.product.id] ? "opacity-100 scale-100" : "opacity-0 scale-95"
+                                                        }`}
+                                                        onLoad={() => handleImageLoad(item.product.id)}
+                                                        loading="lazy"
                                                     />
                                                 </div>
                                                 <div className="font-medium text-gray-800">{item.product.product_name}</div>
@@ -558,32 +567,32 @@ function Payment({setCurrentTitle}) {
                                             </td>
                                             <td className="py-4 px-4 text-center font-medium">{item.quantity}</td>
                                             <td className="py-4 px-4 text-right font-semibold text-gray-900">
-                                            {item.product.discount ? (
-                                                <div className="flex flex-col items-end">
-                                                    <span className="text-red-500 font-bold text-lg">
-                                                        {new Intl.NumberFormat('vi-VN', {
-                                                            style: 'currency',
-                                                            currency: 'VND',
-                                                        }).format(
-                                                            item.product.price * (1 - item.product.discount.discount_value / 100)
-                                                        )}
-                                                    </span>
-                                                    <span className="line-through text-gray-500 text-sm mt-1">
+                                                {item.product.discount && new Date(item.product.discount.end_date) > new Date() ? (
+                                                    <div className="flex flex-col items-end">
+                                                        <span className="text-red-500 font-bold text-lg">
+                                                            {new Intl.NumberFormat('vi-VN', {
+                                                                style: 'currency',
+                                                                currency: 'VND',
+                                                            }).format(
+                                                                item.product.price * (1 - item.product.discount.discount_value / 100)
+                                                            )}
+                                                        </span>
+                                                        <span className="line-through text-gray-500 text-sm mt-1">
+                                                            {new Intl.NumberFormat('vi-VN', {
+                                                                style: 'currency',
+                                                                currency: 'VND',
+                                                            }).format(item.product.price)}
+                                                        </span>
+                                                    </div>
+                                                ) : (
+                                                    <span className="font-semibold text-lg">
                                                         {new Intl.NumberFormat('vi-VN', {
                                                             style: 'currency',
                                                             currency: 'VND',
                                                         }).format(item.product.price)}
                                                     </span>
-                                                </div>
-                                            ) : (
-                                                <span className="font-semibold text-lg">
-                                                    {new Intl.NumberFormat('vi-VN', {
-                                                        style: 'currency',
-                                                        currency: 'VND',
-                                                    }).format(item.product.price)}
-                                                </span>
-                                            )}
-                                        </td>
+                                                )}
+                                            </td>
                                         </tr>
                                     ))}
                                     </tbody>

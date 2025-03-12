@@ -1,20 +1,19 @@
 import { useState } from "react";
-import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import { ChevronLeft, ChevronRight, Heart, ShoppingCart, Eye, Package, ShieldCheck, Award } from "lucide-react";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import Slider from "react-slick";
 import { src } from "../../../Api";
-import { HeartIcon, ShoppingCartIcon } from "lucide-react";
 
 // Nút mũi tên quay lại
 function PrevArrow(props) {
     const { onClick } = props;
     return (
         <button
-            className="custom-prev-arrow absolute top-1/2 left-[-40px] transform -translate-y-1/2 bg-white shadow-lg hover:bg-gray-300 text-gray-700 p-3 rounded-full focus:outline-none transition-all duration-300 ease-in-out hidden xl:flex items-center justify-center w-10 h-10"
-            style={{ zIndex: 1000 }}
+            className="custom-prev-arrow absolute top-1/2 left-[-20px] transform -translate-y-1/2 bg-white shadow-lg hover:bg-gray-100 text-gray-700 p-2 rounded-full focus:outline-none transition-all duration-300 ease-in-out hidden lg:flex items-center justify-center w-10 h-10 border border-gray-200"
+            style={{ zIndex: 10 }}
             onClick={onClick}
         >
-            <FaChevronLeft size={20} />
+            <ChevronLeft size={18} />
         </button>
     );
 }
@@ -24,22 +23,22 @@ function NextArrow(props) {
     const { onClick } = props;
     return (
         <button
-            className="custom-next-arrow absolute top-1/2 right-[-40px] transform -translate-y-1/2 bg-white shadow-lg hover:bg-gray-300 text-gray-700 p-3 rounded-full focus:outline-none transition-all duration-300 ease-in-out hidden xl:flex items-center justify-center w-10 h-10"
-            style={{ zIndex: 1000 }}
+            className="custom-next-arrow absolute top-1/2 right-[-20px] transform -translate-y-1/2 bg-white shadow-lg hover:bg-gray-100 text-gray-700 p-2 rounded-full focus:outline-none transition-all duration-300 ease-in-out hidden lg:flex items-center justify-center w-10 h-10 border border-gray-200"
+            style={{ zIndex: 10 }}
             onClick={onClick}
         >
-            <FaChevronRight size={20} />
+            <ChevronRight size={18} />
         </button>
     );
 }
 
 function Related_Product({ relatedProducts, setId_product }) {
     const settings = {
-        dots: false,
+        dots: true,
         infinite: true,
-        speed: 1000,
+        speed: 800,
         autoplay: true,
-        autoplaySpeed: 3000,
+        autoplaySpeed: 4000,
         arrows: relatedProducts.length > 3,
         prevArrow: <PrevArrow />,
         nextArrow: <NextArrow />,
@@ -48,6 +47,13 @@ function Related_Product({ relatedProducts, setId_product }) {
                 breakpoint: 10000,
                 settings: {
                     slidesToShow: 5,
+                    slidesToScroll: 1,
+                },
+            },
+            {
+                breakpoint: 1280,
+                settings: {
+                    slidesToShow: 4,
                     slidesToScroll: 1,
                 },
             },
@@ -68,108 +74,159 @@ function Related_Product({ relatedProducts, setId_product }) {
             {
                 breakpoint: 480,
                 settings: {
-                    slidesToShow: 2,
+                    slidesToShow: 1,
                     slidesToScroll: 1,
+                    dots: true,
+                    arrows: false,
                 },
             },
         ],
     };
-    const [loaded, setLoaded] = useState(false)
+    const [loadedImages, setLoadedImages] = useState({});
     const [hoveredProduct, setHoveredProduct] = useState(null);
-    const handleProduct = (id, product_name, product) => {
-        localStorage.setItem("productShow", id)
-        localStorage.setItem("productShowName", product_name)
-        setId_product(id);
+
+    const handleImageLoad = (id) => {
+        setLoadedImages((prev) => ({ ...prev, [id]: true }));
+    };
+
+    const handleProduct = (product) => {
+        localStorage.setItem("productShow", product.id);
+        localStorage.setItem("productShowName", product.product_name);
+        setId_product(product.id);
+        
         let viewedProducts = JSON.parse(localStorage.getItem("viewedProducts")) || [];
-    
-        // Kiểm tra nếu sản phẩm đã tồn tại trong danh sách, thì xóa nó đi trước khi thêm mới
         viewedProducts = viewedProducts.filter(p => p.id !== product.id);
-    
-        // Thêm sản phẩm mới lên đầu danh sách
         viewedProducts.unshift(product);
-    
-        // Giới hạn số lượng sản phẩm lưu (ví dụ: chỉ lưu 5 sản phẩm gần nhất)
+        
         if (viewedProducts.length > 5) {
             viewedProducts.pop();
         }
-    
+        
         localStorage.setItem("viewedProducts", JSON.stringify(viewedProducts));
-    }
+    };
     
     return (
-        <div className="bg-gray-50 ">
-            <div className="">
-                {
-                    relatedProducts.length > 3 && (
-                        <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">Sản phẩm liên quan</h2>
-                    )
-                }
-                <Slider {...settings} className="" >
-                    {relatedProducts && relatedProducts.length > 3 &&
-                        relatedProducts.map((product, index) => (
-                            <div key={index} className="p-2"                                         
-                            onMouseEnter={() => setHoveredProduct(product.id)}
-                            onMouseLeave={() => setHoveredProduct(null)}>
-                                <div className="bg-white border border-red-50 h-[420px] relative rounded-xl shadow-lg overflow-hidden transition-all duration-300 hover:shadow-2xl hover:-translate-y-2">
-                                    <button className="absolute top-3 right-3 z-10 bg-white/70 rounded-full p-2 hover:bg-white hover:shadow-md transition-all">
-                                        <HeartIcon 
-                                            className={`w-5 h-5 ${
-                                                hoveredProduct === product.id 
-                                                    ? 'text-red-500 fill-current' 
-                                                    : 'text-gray-400'
-                                            }`} 
-                                        />
-                                    </button>
-                                    <a
-                                        href={`/product/${encodeURIComponent(product.product_name)}`}
-                                        onClick={() => handleProduct(product.id, product.product_name, product)}
-                                        className="block"
+        <div className="bg-gradient-to-b from-gray-50 to-white py-10">
+            <div className="container mx-auto px-4">
+                {relatedProducts.length > 3  && (
+                    <div className="flex items-center justify-center mb-8">
+                        <div className="h-0.5 bg-gray-200 w-16 mr-4"></div>
+                        <h2 className="text-2xl font-bold text-gray-800 relative">
+                            <span className="relative z-10">Sản phẩm liên quan</span>
+                            <span className="absolute bottom-0 left-0 w-full h-3 bg-blue-100 opacity-40 -z-10"></span>
+                        </h2>
+                        <div className="h-0.5 bg-gray-200 w-16 ml-4"></div>
+                    </div>
+                )}
+                
+                <Slider {...settings} className="related-products-slider -mx-3">
+                    {
+                        relatedProducts && relatedProducts.length > 3 && (
+                            relatedProducts.map((product) => (
+                                <div key={product.id} className="px-3 py-2">
+                                    <div 
+                                        className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 h-full flex flex-col"
+                                        onMouseEnter={() => setHoveredProduct(product.id)}
+                                        onMouseLeave={() => setHoveredProduct(null)}
                                     >
-                                        <div className="h-[250px] mt-5 flex items-center justify-center p-4 bg-gray-50 relative">
-                                            <LazyLoadImage
-                                                src={`${src}storage/${product.thumbnail}`}
-                                                alt="" 
-                                                className={`absolute top-0 left-0 w-full h-full object-contain transition-opacity duration-500 ${loaded ? 'opacity-0' : 'opacity-100'}`}
-                                                loading="lazy"
-                                            />
-                                            <LazyLoadImage
-                                                src={loaded ? `${src}imgProduct/${product.images}` : `${src}storage/${product.thumbnail}`}  // Ảnh chính thay thế ảnh mờ khi tải xong
-                                                alt={product.product_name}  
-                                                className={`w-full h-full object-contain transition-opacity duration-500 transform ${loaded ? 'opacity-100 scale-100' : 'opacity-0 scale-90'}`} 
-                                                onLoad={() => setLoaded(true)}  
-                                                loading="lazy"
-                                                aria-hidden={!loaded} 
-                                            />
-                                        </div>
-
-                                        <div className="p-4">
-                                            <h3 
-                                                className="text-blue-800 font-semibold mb-2 line-clamp-2 h-12"
+                                        <a
+                                            href={`/product/${encodeURIComponent(product.product_name)}`}
+                                            onClick={() => handleProduct(product)}
+                                            className="block relative"
+                                        >
+                                            <div className="relative overflow-hidden group">
+                                                <div className="h-[200px] bg-gradient-to-b from-gray-50 to-white flex items-center justify-center p-4">
+                                                    <LazyLoadImage
+                                                        src={`${src}imgProduct/${product.images}`}
+                                                        alt={product.product_name}
+                                                        className={`w-full h-full object-contain transition-all duration-500 ${
+                                                            loadedImages[product.id] 
+                                                                ? "opacity-100 scale-100" 
+                                                                : "opacity-0 scale-95"
+                                                        } ${hoveredProduct === product.id ? "transform scale-110" : ""}`}
+                                                        onLoad={() => handleImageLoad(product.id)}
+                                                        loading="lazy"
+                                                    />
+                                                </div>
+                                                {product.discount && new Date(product.discount.end_date) > new Date() && (
+                                                    <div className="absolute top-3 left-3">
+                                                        <span className="bg-gradient-to-r from-red-500 to-red-600 text-white text-xs font-bold py-1 px-3 rounded-full flex items-center">
+                                                            <Award size={12} className="mr-1" />
+                                                            {product.discount.discount_value}%
+                                                        </span>
+                                                    </div>
+                                                )}
+                                                <div className="absolute top-3 right-3 flex flex-col gap-2">
+                                                    <button className="bg-white p-2 rounded-full shadow-md hover:bg-blue-50 transition-colors duration-300 text-gray-600 hover:text-blue-600 opacity-0 group-hover:opacity-100">
+                                                        <Heart size={16} />
+                                                    </button>
+                                                    <button className="bg-white p-2 rounded-full shadow-md hover:bg-blue-50 transition-colors duration-300 text-gray-600 hover:text-blue-600 opacity-0 group-hover:opacity-100">
+                                                        <ShoppingCart size={16} />
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </a>
+        
+                                        <div className="p-4 flex flex-col flex-grow">
+                                            <div className="flex items-center text-gray-500 text-xs mb-2">
+                                                <Eye size={14} className="mr-1" />
+                                                <span>{product.views} lượt xem</span>
+                                            </div>
+                                            
+                                            <a
+                                                href={`/product/${encodeURIComponent(product.product_name)}`}
+                                                onClick={() => handleProduct(product)}
+                                                className="group"
                                             >
-                                                {product.product_name}
-                                            </h3>
-                                            <div className="flex justify-between items-center">
-                                                <p className="text-lg font-bold text-red-600">
-                                                    {new Intl.NumberFormat("vi-VN", {
-                                                        style: "currency",
-                                                        currency: "VND",
-                                                    }).format(product.price)}
-                                                </p>
-                                                <button 
-                                                    className={`p-2 rounded-full transition-all ${
-                                                        hoveredProduct === product.id 
-                                                            ? 'bg-blue-500 text-white shadow-md' 
-                                                            : 'bg-gray-200 text-gray-500'
-                                                    }`}
-                                                >
-                                                    <ShoppingCartIcon className="w-5 h-5" />
-                                                </button>
+                                                <h3 className="font-medium text-gray-800 text-sm line-clamp-2 h-10 group-hover:text-blue-600 transition-colors duration-300">
+                                                    {product.product_name}
+                                                </h3>
+                                            </a>
+                                            
+                                            <div className="mt-2 mb-3">
+                                                {product.discount && new Date(product.discount.end_date) > new Date() ? (
+                                                    <div className="flex items-baseline gap-2">
+                                                        <span className="text-lg font-bold text-red-600">
+                                                            {new Intl.NumberFormat("vi-VN", {
+                                                                style: "currency",
+                                                                currency: "VND",
+                                                            }).format(product.price * (1 - product.discount.discount_value / 100))}
+                                                        </span>
+                                                        <span className="text-xs text-gray-400 line-through">
+                                                            {new Intl.NumberFormat("vi-VN", {
+                                                                style: "currency",
+                                                                currency: "VND",
+                                                            }).format(product.price)}
+                                                        </span>
+                                                    </div>
+                                                ) : (
+                                                    <span className="text-lg font-bold text-gray-800">
+                                                        {new Intl.NumberFormat("vi-VN", {
+                                                            style: "currency",
+                                                            currency: "VND",
+                                                        }).format(product.price)}
+                                                    </span>
+                                                )}
+                                            </div>                                     
+                                            <div className="bg-gray-50 rounded-lg p-3 mt-auto border border-gray-100">
+                                                <div className="flex items-center text-gray-600 text-xs">
+                                                    <Package size={14} className="text-green-500 mr-2 flex-shrink-0" />
+                                                    <p>Giao hàng miễn phí</p>
+                                                </div>
+                                                <div className="flex items-center text-gray-600 text-xs mt-2">
+                                                    <ShieldCheck size={14} className="text-green-500 mr-2 flex-shrink-0" />
+                                                    <p>Bảo hành chính hãng</p>
+                                                </div>
                                             </div>
                                         </div>
-                                    </a>
+                                        
+                                        <div className="absolute bottom-0 left-0 w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white py-2.5 text-center text-sm font-medium transform translate-y-full group-hover:translate-y-0 transition-transform duration-300 opacity-0 group-hover:opacity-100">
+                                            Xem chi tiết
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-                        )) 
+                            ))
+                        )
                     }
                 </Slider>
             </div>

@@ -101,7 +101,7 @@ function ModalRating({ product, setShowRating  }) {
                                             <div className="flex-shrink-0 mr-4">
                                             {rating.customer.image ? (
                                                 <img 
-                                                    src={src +`storage/imgCustomer/${rating.customer.image}`} 
+                                                    src={src +`imgCustomer/${rating.customer.image}`} 
                                                     alt={rating.customer.name} 
                                                     className="w-12 h-12 rounded-full object-cover"
                                                     onError={(e) => { e.target.src = '/placeholder-avatar.png' }}
@@ -145,7 +145,7 @@ function ModalRating({ product, setShowRating  }) {
                                                     {rating.image && rating.image.length > 0 && (
                                                         <div className="flex items-center mt-2">
                                                             <img 
-                                                                src={src + `storage/rating/${rating.image}`} 
+                                                                src={src + `rating/${rating.image}`} 
                                                                 alt={rating.customer.name} 
                                                                 className="w-32 h-full mr-2 rounded-lg object-cover"
                                                                 onError={(e) => { e.target.src = '/placeholder-image.png' }}

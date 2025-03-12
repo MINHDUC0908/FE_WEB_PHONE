@@ -11,7 +11,7 @@ import ProductShowImage from "./Component/ProductImage";
 import ProductDes from "./Component/ProductDes";
 import { CommentSystem } from "./comments/Comment";
 import RatingProduct from "./comments/RatingProduct";
-import { p } from "framer-motion/client";
+import { FaShoppingBag } from "react-icons/fa";
 
 function ShowProduct({ setCurrentTitle }) {
     const { product, loading, setId_product, relatedProducts, setProduct } = useDataProduct();
@@ -97,13 +97,11 @@ function ShowProduct({ setCurrentTitle }) {
     if (loading || !product) {
         return (
             <div className="fixed inset-0 z-50 flex items-center justify-center">
-                <div className="absolute inset-0 bg-black bg-opacity-50 backdrop-blur-sm animate-fade-in"></div>
-                <div className="relative w-full max-w-2xl rounded-lg shadow-2xl animate-bounce-in">
-                    <p className="text-center text-white text-lg font-semibold animate-pulse">
-                        Đang loading...
-                    </p>
-                    <div className="flex justify-center mt-4">
-                        <div className="w-12 h-12 border-4 border-t-4 border-white border-t-blue-500 rounded-full animate-spin"></div>
+                <div className="absolute inset-0 bg-black bg-opacity-40 backdrop-blur-sm animate-fade-in"></div>
+                <div className="relative">
+                    <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-500"></div>
+                    <div className="absolute top-0 left-0 right-0 bottom-0 flex items-center justify-center">
+                        <FaShoppingBag className="text-blue-500 text-lg" />
                     </div>
                 </div>
             </div>
@@ -126,23 +124,27 @@ function ShowProduct({ setCurrentTitle }) {
                                 <div className="product-detail-container p-4 rounded-lg border border-gray-100 shadow-sm">
                                     <div className="mb-3">
                                         <div className="mb-3 md:mb-4">
-                                            {product.discount ? (
-                                                <div className="flex flex-col xs:flex-row xs:items-baseline gap-1 xs:gap-3">
-                                                    <span className="text-xl sm:text-2xl md:text-3xl font-bold text-red-600">
-                                                        {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(product.price * (1 - product.discount.discount_value/ 100))}
+                                            {product.discount && new Date(product.discount.end_date) > new Date() ? (
+                                                <div className="flex items-baseline gap-2">
+                                                    <span className="text-lg font-bold text-red-600">
+                                                        {new Intl.NumberFormat("vi-VN", {
+                                                            style: "currency",
+                                                            currency: "VND",
+                                                        }).format(product.price * (1 - product.discount.discount_value / 100))}
                                                     </span>
-                                                    <div>
-                                                        <span className="text-gray-400 text-sm sm:text-base line-through">
-                                                            {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(product.price)}
-                                                        </span>
-                                                        <span className="ml-2 text-sm text-red-500 font-semibold">
-                                                            {product.discount.discount_value}%
-                                                        </span>
-                                                    </div>
+                                                    <span className="text-xs text-gray-400 line-through">
+                                                        {new Intl.NumberFormat("vi-VN", {
+                                                            style: "currency",
+                                                            currency: "VND",
+                                                        }).format(product.price)}
+                                                    </span>
                                                 </div>
                                             ) : (
-                                                <span className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800">
-                                                    {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(product.price)}
+                                                <span className="text-lg font-bold text-gray-800">
+                                                    {new Intl.NumberFormat("vi-VN", {
+                                                        style: "currency",
+                                                        currency: "VND",
+                                                    }).format(product.price)}
                                                 </span>
                                             )}
                                         </div>
@@ -299,8 +301,8 @@ function ShowProduct({ setCurrentTitle }) {
                             <RatingProduct product={product} setProduct={setProduct} />
                         </div>
                     </div>
+                    <Related_Product relatedProducts={relatedProducts} setId_product={setId_product}/>
                 </div>
-                <Related_Product relatedProducts={relatedProducts} setId_product={setId_product}/>
                 <FooterProduct />
             </div>
         </>

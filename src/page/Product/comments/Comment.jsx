@@ -90,9 +90,9 @@ export const CommentSystem = ({ product }) => {
 
         const imagePath =
             reply.author_type === 'admin'
-                ? `storage/profile_images/${reply.author_details?.image}`
+                ? `profile_image/${reply.author_details?.image}`
                 : reply.author_type === 'customer'
-                ? `storage/imgCustomer/${reply.author_details?.image}`
+                ? `imgCustomer/${reply.author_details?.image}`
                 : null;
 
         return (
@@ -237,7 +237,7 @@ export const CommentSystem = ({ product }) => {
                 <div className="flex items-center mb-2">
                     {comment.author_details.image && (
                         <img 
-                            src={src + `storage/imgCustomer/${comment.author_details.image}`} 
+                            src={src + `imgCustomer/${comment.author_details.image}`} 
                             className="w-10 h-10 rounded-full object-cover border-2 border-gray-300 mr-2"
                         />
                     )}

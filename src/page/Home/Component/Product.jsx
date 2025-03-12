@@ -1,11 +1,12 @@
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import Slider from "react-slick";
 import { FaEye } from "react-icons/fa";
 import { useDataProduct } from "../../../Context/ProductContext";
 import { api, src } from "../../../Api";
 import { LazyLoadImage } from "react-lazy-load-image-component";
+import { Award, Eye, Heart, Package, ShieldCheck, ShoppingCart } from "lucide-react";
 
 // Nút mũi tên quay lại
 function PrevArrow(props) {
@@ -38,44 +39,42 @@ function NextArrow(props) {
 function Product() {
     const [incrementProduct, setIncrementProduct] = useState([]);
     const [newProduct, setNewProduct] = useState([]);
-    const [lastUpdated, setLastUpdated] = useState(null);
+    const [isLoading, setIsLoading] = useState(true);
+    const [loadedImages, setLoadedImages] = useState({});
     const {setId_product} = useDataProduct();
-    const [loaded, setLoaded] = useState(false);
-
-    const fetchIncrementProduct = async () => {
+    const [hoveredProduct, setHoveredProduct] = useState(null);
+    const handleImageLoad = (id) => {
+        setLoadedImages((prev) => ({ ...prev, [id]: true }));
+    };
+    
+    const fetchProducts = useCallback(async () => {
+        setIsLoading(true);
         try {
-            const result = await axios.get(api + "incrementProduct");
-            if (result && result.data) {
-                const newData = result.data.data;
-                if (JSON.stringify(newData) !== JSON.stringify(incrementProduct)) {
-                    setIncrementProduct(newData);
-                    setLastUpdated(new Date().toISOString());
-                }
+            const [incrementResult, newResult] = await Promise.all([
+                axios.get(api + "incrementProduct"),
+                axios.get(api + "ProductNew")
+            ]);
+            
+            if (incrementResult && incrementResult.data) {
+                setIncrementProduct(incrementResult.data.data);
+            }
+            
+            if (newResult && newResult.data) {
+                setNewProduct(newResult.data.data);
             }
         } catch (error) {
-            console.log(error, "Đã xảy ra lỗi");
+            console.log(error, "Đã xảy ra lỗi khi tải sản phẩm");
+        } finally {
+            setIsLoading(false);
         }
-    };
-    const fetchNewProduct = async () => {
-        try {
-            const result = await axios.get(api + "ProductNew");
-            if (result && result.data) {
-                const newData = result.data.data;
-                if (JSON.stringify(newData) !== JSON.stringify(newProduct)) {
-                    setNewProduct(newData);
-                    setLastUpdated(new Date().toISOString());
-                }
-            }
-        } catch (error) {
-            console.log(error, "Đã xảy ra lỗi");
-        }
-    };
+    }, [api]);
+    
     useEffect(() => {
-        fetchIncrementProduct();
-        fetchNewProduct();
-    }, []);
-    console.log(newProduct);
-
+        fetchProducts();
+        return () => {
+           
+        };
+    }, [fetchProducts]); 
     const settings = {
         dots: true,
         infinite: true,
@@ -136,110 +135,110 @@ function Product() {
                 <div className="pb-12">
                         <Slider {...settings} className="featured-products-slider -mx-2">
                             {incrementProduct.map((product) => (
-                                <div key={product.id} className="px-2">
-                                    <div className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100">
+                                <div key={product.id} className="px-3 py-2">
+                                <div 
+                                    className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 h-full flex flex-col"
+                                    onMouseEnter={() => setHoveredProduct(product.id)}
+                                    onMouseLeave={() => setHoveredProduct(null)}
+                                >
+                                    <a
+                                        href={`/product/${encodeURIComponent(product.product_name)}`}
+                                        onClick={() => handleProduct(product)}
+                                        className="block relative"
+                                    >
+                                        <div className="relative overflow-hidden group">
+                                            <div className="h-[200px] bg-gradient-to-b from-gray-50 to-white flex items-center justify-center p-4">
+                                                <LazyLoadImage
+                                                    src={`${src}imgProduct/${product.images}`}
+                                                    alt={product.product_name}
+                                                    className={`w-full h-full object-contain transition-all duration-500 ${
+                                                        loadedImages[product.id] 
+                                                            ? "opacity-100 scale-100" 
+                                                            : "opacity-0 scale-95"
+                                                    } ${hoveredProduct === product.id ? "transform scale-110" : ""}`}
+                                                    onLoad={() => handleImageLoad(product.id)}
+                                                    loading="lazy"
+                                                />
+                                            </div>
+                                            
+                                            {product.discount && (
+                                                <div className="absolute top-3 left-3">
+                                                    <span className="bg-gradient-to-r from-red-500 to-red-600 text-white text-xs font-bold py-1 px-3 rounded-full flex items-center">
+                                                        <Award size={12} className="mr-1" />
+                                                        {product.discount.discount_value}%
+                                                    </span>
+                                                </div>
+                                            )}
+                                            
+                                            <div className="absolute top-3 right-3 flex flex-col gap-2">
+                                                <button className="bg-white p-2 rounded-full shadow-md hover:bg-blue-50 transition-colors duration-300 text-gray-600 hover:text-blue-600 opacity-0 group-hover:opacity-100">
+                                                    <Heart size={16} />
+                                                </button>
+                                                <button className="bg-white p-2 rounded-full shadow-md hover:bg-blue-50 transition-colors duration-300 text-gray-600 hover:text-blue-600 opacity-0 group-hover:opacity-100">
+                                                    <ShoppingCart size={16} />
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </a>
+    
+                                    <div className="p-4 flex flex-col flex-grow">
+                                        <div className="flex items-center text-gray-500 text-xs mb-2">
+                                            <Eye size={14} className="mr-1" />
+                                            <span>{product.views} lượt xem</span>
+                                        </div>
+                                        
                                         <a
                                             href={`/product/${encodeURIComponent(product.product_name)}`}
                                             onClick={() => handleProduct(product)}
-                                            className="block h-full"
+                                            className="group"
                                         >
-                                            <div className="relative overflow-hidden group">
-                                                <div className="h-[220px] bg-gradient-to-b from-gray-50 to-gray-100 flex items-center justify-center p-6">
-                                                    <LazyLoadImage
-                                                        src={`${src}storage/${product.thumbnail}`}
-                                                        alt=""
-                                                        className="absolute inset-0 w-full h-full object-contain opacity-0 transition-opacity duration-500"
-                                                        style={{ opacity: loaded ? 0 : 0.8 }}
-                                                        loading="lazy"
-                                                    />
-                                                    <LazyLoadImage
-                                                        src={loaded ? `${src}imgProduct/${product.images}` : `${src}storage/${product.thumbnail}`}
-                                                        alt={product.product_name}
-                                                        className="w-full h-full object-contain transition-all duration-500"
-                                                        style={{ 
-                                                            opacity: loaded ? 1 : 0,
-                                                            transform: `scale(${loaded ? 1 : 0.9})`
-                                                        }}
-                                                        onLoad={() => setLoaded(true)}
-                                                        loading="lazy"
-                                                    />
-                                                    <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                                                </div>
-                                            
-                                                {product.discount && (
-                                                    <div className="absolute top-3 right-3">
-                                                    <span className="bg-red-500 text-white text-xs font-bold py-1 px-2 rounded-full">
-                                                        -{product.discount.discount_value}%
-                                                    </span>
-                                                    </div>
-                                                )}
-                                            </div>
-                                            <div className="p-4 flex flex-col flex-grow">
-                                                <h3 className="font-medium text-blue-600 text-[14px] line-clamp-2 h-16">
-                                                    {product.product_name}
-                                                </h3>
-                                                
-                                                <div className="text-center flex flex-col justify-center">
-                                                    {product.discount ? (
-                                                        <>
-                                                            <span className="text-xl font-bold text-red-600">
-                                                            {new Intl.NumberFormat("vi-VN", {
-                                                                style: "currency",
-                                                                currency: "VND",
-                                                            }).format(product.price * (1 - product.discount.discount_value / 100))}
-                                                            </span>
-                                                            <span className="text-sm text-gray-400 line-through">
-                                                            {new Intl.NumberFormat("vi-VN", {
-                                                                style: "currency",
-                                                                currency: "VND",
-                                                            }).format(product.price)}
-                                                            </span>
-                                                        </>
-                                                    ) : (
-                                                        <>
-                                                            <span className="text-xl font-bold text-gray-800">
-                                                            {new Intl.NumberFormat("vi-VN", {
-                                                                style: "currency",
-                                                                currency: "VND",
-                                                            }).format(product.price)}
-                                                            </span>
-                                                            <span className="text-sm text-transparent">
-                                                            &nbsp;
-                                                            </span>
-                                                        </>
-                                                    )}
-                                                </div>
-                                                <div className="flex items-center text-gray-500 text-sm">
-                                                    <span className="flex items-center">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                                        </svg>
-                                                        {product.views}
-                                                    </span>
-                                                </div>
-                                                <div className="bg-gray-50 rounded-lg p-3 mt-auto border border-gray-100">
-                                                    <div className="flex items-center text-gray-600 text-sm">
-                                                        <div className="hidden lg:block">
-                                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                                            </svg>
-                                                        </div>
-                                                        <p className="text-[9px]">Giao hàng miễn phí</p>
-                                                    </div>
-                                                    <div className="flex items-center text-gray-600 text-sm mt-1">
-                                                        <div className="hidden lg:block">
-                                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                                                            </svg>
-                                                        </div>
-                                                        <p className="text-[9px]">Bảo hành chính hãng</p>
-                                                    </div>
-                                                </div>
-                                            </div>
+                                            <h3 className="font-medium text-gray-800 text-sm line-clamp-2 h-10 group-hover:text-blue-600 transition-colors duration-300">
+                                                {product.product_name}
+                                            </h3>
                                         </a>
+                                        
+                                        <div className="mt-2 mb-3">
+                                            {product.discount && new Date(product.discount.end_date) > new Date() ? (
+                                                <div className="flex items-baseline gap-2">
+                                                    <span className="text-lg font-bold text-red-600">
+                                                        {new Intl.NumberFormat("vi-VN", {
+                                                            style: "currency",
+                                                            currency: "VND",
+                                                        }).format(product.price * (1 - product.discount.discount_value / 100))}
+                                                    </span>
+                                                    <span className="text-xs text-gray-400 line-through">
+                                                        {new Intl.NumberFormat("vi-VN", {
+                                                            style: "currency",
+                                                            currency: "VND",
+                                                        }).format(product.price)}
+                                                    </span>
+                                                </div>
+                                            ) : (
+                                                <span className="text-lg font-bold text-gray-800">
+                                                    {new Intl.NumberFormat("vi-VN", {
+                                                        style: "currency",
+                                                        currency: "VND",
+                                                    }).format(product.price)}
+                                                </span>
+                                            )}
+                                        </div>
+                                        <div className="bg-gray-50 rounded-lg p-3 mt-auto border border-gray-100">
+                                            <div className="flex items-center text-gray-600 text-xs">
+                                                <Package size={14} className="text-green-500 mr-2 flex-shrink-0" />
+                                                <p>Giao hàng miễn phí</p>
+                                            </div>
+                                            <div className="flex items-center text-gray-600 text-xs mt-2">
+                                                <ShieldCheck size={14} className="text-green-500 mr-2 flex-shrink-0" />
+                                                <p>Bảo hành chính hãng</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="absolute bottom-0 left-0 w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white py-2.5 text-center text-sm font-medium transform translate-y-full group-hover:translate-y-0 transition-transform duration-300 opacity-0 group-hover:opacity-100">
+                                        Xem chi tiết
                                     </div>
                                 </div>
+                            </div>
                             ))}
                         </Slider>
                     </div>
@@ -251,7 +250,7 @@ function Product() {
                 <div className="pb-12">
                     <Slider {...settings} className="newest-products-slider -mx-2">
                         {newProduct.map((product) => (
-                            <div key={product.id} className="px-2">
+                            <div key={product.id} className="px-3">
                                 <div className="bg-white rounded-xl overflow-hidden transition-all duration-300 shadow-sm hover:shadow-xl border border-gray-100 h-full">
                                     <a
                                         href={`/product/${encodeURIComponent(product.product_name)}`}
@@ -261,23 +260,13 @@ function Product() {
                                         <div className="relative group">
                                             <div className="h-[220px] bg-gradient-to-b from-gray-50 to-gray-100 flex items-center justify-center p-6">
                                                 <LazyLoadImage
-                                                    src={`${src}storage/${product.thumbnail}`}
-                                                    alt=""
-                                                    className="absolute inset-0 w-full h-full object-contain opacity-0 transition-opacity duration-500"
-                                                    style={{ opacity: loaded ? 0 : 0.8 }}
+                                                    src={`${src}imgProduct/${product.images}`}
+                                                    alt={product.title}
+                                                    className={`w-full h-full object-contain transition-all duration-500 ${
+                                                        loadedImages[product.id] ? "opacity-100 scale-100" : "opacity-0 scale-95"
+                                                    }`}
+                                                    onLoad={() => handleImageLoad(product.id)}
                                                     loading="lazy"
-                                                />
-                                                <LazyLoadImage
-                                                    src={loaded ? `${src}imgProduct/${product.images}` : `${src}storage/${product.thumbnail}`}
-                                                    alt={product.product_name}
-                                                    className="w-full h-full object-contain transition-all duration-500"
-                                                    style={{ 
-                                                        opacity: loaded ? 1 : 0,
-                                                        transform: `scale(${loaded ? 1 : 0.9})`
-                                                    }}
-                                                    onLoad={() => setLoaded(true)}
-                                                    loading="lazy"
-                                                    aria-hidden={!loaded}
                                                 />
                                                 <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                                             </div>
@@ -291,7 +280,7 @@ function Product() {
                                                 </span>
                                             </div>
                                         
-                                            {product.discount && (
+                                            {product.discount && new Date(product.discount.end_date) > new Date() && (
                                                 <div className="absolute top-2 right-2">
                                                 <span className="inline-flex items-center bg-red-500 text-white text-xs font-medium px-2 py-1 rounded-full">
                                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -308,36 +297,31 @@ function Product() {
                                                 {product.product_name}
                                             </h3>
                                             
-                                            <div className="text-center mb-3 h-14 flex flex-col justify-center">
-                                                {product.discount ? (
-                                                    <>
-                                                        <span className="text-xl font-bold text-red-600">
+                                            <div className="mt-2 mb-3">
+                                            {product.discount && new Date(product.discount.end_date) > new Date() ? (
+                                                <div className="flex items-baseline gap-2">
+                                                    <span className="text-lg font-bold text-red-600">
                                                         {new Intl.NumberFormat("vi-VN", {
                                                             style: "currency",
                                                             currency: "VND",
                                                         }).format(product.price * (1 - product.discount.discount_value / 100))}
-                                                        </span>
-                                                        <span className="text-sm text-gray-400 line-through">
+                                                    </span>
+                                                    <span className="text-xs text-gray-400 line-through">
                                                         {new Intl.NumberFormat("vi-VN", {
                                                             style: "currency",
                                                             currency: "VND",
                                                         }).format(product.price)}
-                                                        </span>
-                                                    </>
-                                                ) : (
-                                                    <>
-                                                        <span className="text-xl font-bold text-gray-800">
-                                                        {new Intl.NumberFormat("vi-VN", {
-                                                            style: "currency",
-                                                            currency: "VND",
-                                                        }).format(product.price)}
-                                                        </span>
-                                                        <span className="text-sm text-transparent">
-                                                        &nbsp;
-                                                        </span>
-                                                    </>
-                                                )}
-                                            </div>
+                                                    </span>
+                                                </div>
+                                            ) : (
+                                                <span className="text-lg font-bold text-gray-800">
+                                                    {new Intl.NumberFormat("vi-VN", {
+                                                        style: "currency",
+                                                        currency: "VND",
+                                                    }).format(product.price)}
+                                                </span>
+                                            )}
+                                        </div>
                                             <div className="bg-gray-50 rounded-lg p-3 mt-auto border border-gray-100">
                                                 <div className="flex items-center text-gray-600">
                                                     <div className="hidden lg:block">

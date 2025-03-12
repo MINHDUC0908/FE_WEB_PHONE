@@ -7,6 +7,7 @@ import { src } from "../../Api";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import SiderBarProduct from "./Component/SidebarProduct";
 import SortProduct from "./Component/SortProduct";
+import { FaShoppingBag } from "react-icons/fa";
 
 function Product({ setCurrentTitle }) {
     const {
@@ -19,6 +20,10 @@ function Product({ setCurrentTitle }) {
     } = useDataProduct();
     const [visibleProducts, setVisibleProducts] = useState(12);
     const [loaded, setLoaded] = useState(false);
+    const [loadedImages, setLoadedImages] = useState({});
+    const handleImageLoad = (id) => {
+        setLoadedImages((prev) => ({ ...prev, [id]: true }));
+    };
     useEffect(() => {
         window.scrollTo(0, 0);
         setCurrentTitle("Cửa hàng - DUC COMPUTER");
@@ -47,11 +52,12 @@ function Product({ setCurrentTitle }) {
     if (loading) {
         return (
             <div className="fixed inset-0 z-50 flex items-center justify-center">
-                <div className="absolute inset-0 bg-black bg-opacity-50 backdrop-blur-sm"></div>
-                <div className="relative rounded-lg shadow-2xl">
-                <div className="flex justify-center mt-4">
-                    <div className="w-12 h-12 border-4 border-t-4 border-white border-t-blue-500 rounded-full animate-spin"></div>
-                </div>
+                <div className="absolute inset-0 bg-black bg-opacity-40 backdrop-blur-sm animate-fade-in"></div>
+                <div className="relative">
+                    <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-500"></div>
+                    <div className="absolute top-0 left-0 right-0 bottom-0 flex items-center justify-center">
+                        <FaShoppingBag className="text-blue-500 text-lg" />
+                    </div>
                 </div>
             </div>
         );
@@ -65,7 +71,7 @@ function Product({ setCurrentTitle }) {
     const displayedProducts = products.slice(0, visibleProducts);
     const hasMoreProducts = visibleProducts < products.length;
     const handleLoadMore = () => {
-        setVisibleProducts((prev) => prev + 4);
+        setVisibleProducts((prev) => prev + 8);
     };
     console.log(products);
     return (
@@ -105,21 +111,16 @@ function Product({ setCurrentTitle }) {
                                         >
                                             <div className="h-48 md:h-56 lg:h-64 relative overflow-hidden bg-gray-50">
                                                 <LazyLoadImage
-                                                    src={`${src}storage/${product.thumbnail}`}
-                                                    alt=""
-                                                    className="absolute inset-0 w-full h-full object-contain opacity-10"
+                                                    src={`${src}imgProduct/${product.images}`}
+                                                    alt={product.title}
+                                                    className={`w-full h-full object-contain transition-all duration-500 ${
+                                                        loadedImages[product.id] ? "opacity-100 scale-100" : "opacity-0 scale-95"
+                                                    }`}
+                                                    onLoad={() => handleImageLoad(product.id)}
                                                     loading="lazy"
                                                 />
-                                                <LazyLoadImage
-                                                    src={loaded ? `${src}imgProduct/${product.images}` : `${src}storage/${product.thumbnail}`}
-                                                    alt={product.product_name}
-                                                    className="w-full h-full object-contain transition-all duration-500"
-                                                    onLoad={() => setLoaded(true)}
-                                                    loading="lazy"
-                                                />
-                                                
                                                 {/* Discount Badge */}
-                                                {product.discount && (
+                                                {product.discount && new Date(product.discount.end_date) > new Date() && (
                                                     <div className="absolute top-2 right-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">
                                                         -{product.discount.discount_value}%
                                                     </div>
@@ -130,54 +131,52 @@ function Product({ setCurrentTitle }) {
                                                     {product.product_name}
                                                 </h3>
                                                 <div className="mt-2">
-                                                    {product.discount ? (
+                                                    {product.discount && new Date(product.discount.end_date) > new Date() ? (
                                                         <div className="flex items-baseline gap-2">
-                                                        <span className="text-lg font-bold text-red-600">
-                                                            {new Intl.NumberFormat("vi-VN", {
-                                                            style: "currency",
-                                                            currency: "VND",
-                                                            }).format(product.price * (1 - product.discount.discount_value / 100))}
-                                                        </span>
-                                                        <span className="text-xs text-gray-400 line-through">
-                                                            {new Intl.NumberFormat("vi-VN", {
-                                                            style: "currency",
-                                                            currency: "VND",
-                                                            }).format(product.price)}
-                                                        </span>
+                                                            <span className="text-lg font-bold text-red-600">
+                                                                {new Intl.NumberFormat("vi-VN", {
+                                                                    style: "currency",
+                                                                    currency: "VND",
+                                                                }).format(product.price * (1 - product.discount.discount_value / 100))}
+                                                            </span>
+                                                            <span className="text-xs text-gray-400 line-through">
+                                                                {new Intl.NumberFormat("vi-VN", {
+                                                                    style: "currency",
+                                                                    currency: "VND",
+                                                                }).format(product.price)}
+                                                            </span>
                                                         </div>
                                                     ) : (
                                                         <span className="text-lg font-bold text-gray-800">
-                                                        {new Intl.NumberFormat("vi-VN", {
-                                                            style: "currency",
-                                                            currency: "VND",
-                                                        }).format(product.price)}
+                                                            {new Intl.NumberFormat("vi-VN", {
+                                                                style: "currency",
+                                                                currency: "VND",
+                                                            }).format(product.price)}
                                                         </span>
                                                     )}
                                                 </div>
-                                                <div className="mt-2 flex items-center justify-between">
-                                                    {product.time_left && (
-                                                        <div className="flex items-center text-xs text-red-500 bg-red-50 rounded px-2 py-1">
-                                                            <svg 
-                                                                xmlns="http://www.w3.org/2000/svg" 
-                                                                fill="none" 
-                                                                viewBox="0 0 24 24" 
-                                                                strokeWidth={2} 
-                                                                stroke="currentColor" 
-                                                                className="w-4 h-4 mr-1"
-                                                            >
-                                                                <path 
-                                                                    strokeLinecap="round" 
-                                                                    strokeLinejoin="round" 
-                                                                    d="M12 6v6l4 2m6-4A10 10 0 11.68 5.08 10 10 0 0122 12z" 
-                                                                />
-                                                            </svg>
-                                                            {product.time_left}
-                                                        </div>
-                                                    )}
-                                                </div>
+                                                {product.discount && new Date(product.discount.end_date) > new Date() && (
+                                                    <div className="flex items-center text-xs text-red-500 bg-red-50 rounded px-2 py-1">
+                                                        <svg 
+                                                            xmlns="http://www.w3.org/2000/svg" 
+                                                            fill="none" 
+                                                            viewBox="0 0 24 24" 
+                                                            strokeWidth={2} 
+                                                            stroke="currentColor" 
+                                                            className="w-4 h-4 mr-1"
+                                                        >
+                                                            <path 
+                                                                strokeLinecap="round" 
+                                                                strokeLinejoin="round" 
+                                                                d="M12 6v6l4 2m6-4A10 10 0 11.68 5.08 10 10 0 0122 12z" 
+                                                            />
+                                                        </svg>
+                                                        {product.time_left}
+                                                    </div>
+                                                )}
                                                 <div className="mt-4 flex justify-between items-center">
                                                     <span className="text-xs text-green-400">
-                                                        {product.discount ? 'Đang giảm giá' : ''}
+                                                        {product.discount && product.discount.time_left ? 'Đang giảm giá' : 'Không có giảm giá'}
                                                     </span>
                                                     <button 
                                                         className="p-2 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white transition-all duration-300 flex items-center justify-center"

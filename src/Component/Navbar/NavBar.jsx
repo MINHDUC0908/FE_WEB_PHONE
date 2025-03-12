@@ -133,7 +133,7 @@ function NavBar()
                                             {user.image ? (
                                                 <LazyLoadImage
                                                     loading="lazy"
-                                                    src={`${user.image.includes("http") ? user.image : src + "storage/imgCustomer/" + user.image}`}
+                                                    src={`${user.image.includes("http") ? user.image : src + "imgCustomer/" + user.image}`}
                                                     alt="User Avatar"
                                                     className={`h-[30px] w-[30px] rounded-full object-cover transition-opacity duration-500 ${
                                                         loaded ? "opacity-100" : "opacity-0"
