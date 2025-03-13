@@ -11,3 +11,18 @@ body{
         @apply bg-primary font-semibold px-6 py-3 rounded-full hover:!scale-110 hover:shadow-xl duration-300
     }
 }
+.zoom-container {
+    position: relative;
+    display: inline-block;
+}
+
+.zoom-lens {
+    width: 150px; 
+    height: 150px;
+    position: absolute;
+    pointer-events: none;
+    background-repeat: no-repeat;
+    display: none;
+    z-index: 10;
+    background-color: rgba(255, 255, 255, 0.2);
+}

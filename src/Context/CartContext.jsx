@@ -117,18 +117,23 @@ export const CartProvider = ({ children }) => {
         }
     }
     useEffect(() => {
-        if (user) {
+        if (!user || !token) {
+            setCount(0);
+            setCart([]);
+            return;
+        }
+    
+        const fetchData = async () => {
             try {
-                CountCart();
-                fetchCart();
+                await Promise.all([CountCart(), fetchCart()]); // Gọi cả hai API đồng thời
             } catch (error) {
                 console.error("Lỗi trong useEffect:", error);
             }
-        } else {
-            setCount(0);
-            setCart([]);
-        }
-    }, [user]);
+        };
+    
+        fetchData();
+    }, [user, token]);
+    
 
     // Tính tổng giá trị sản phẩm đã chọn
     const calculateTotal = useMemo(() => {

@@ -1,9 +1,10 @@
 import img from '../../assets/DUCCOMPUTER.png';
 import { TfiBag } from "react-icons/tfi";
 import { FaRegHeart } from "react-icons/fa";
-import { useState } from "react";
+import { useCallback, useRef, useState } from "react";
+import { FaClockRotateLeft } from "react-icons/fa6";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
-import { IoIosCloseCircle } from "react-icons/io";
+import { IoIosArrowDown, IoIosCloseCircle } from "react-icons/io";
 import { Link, useNavigate } from "react-router-dom";
 import { useDataProduct } from '../../Context/ProductContext';
 import { UseDataUser } from '../../Context/UserContext';
@@ -11,7 +12,12 @@ import { CartData } from '../../Context/CartContext';
 import { src } from '../../Api';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import { useSearch } from '../../Context/SearchContext';
-
+import b1 from '../../assets/search/b1.png'
+import b2 from '../../assets/search/b2.png'
+import b3 from '../../assets/search/b3.png'
+import b4 from '../../assets/search/b4.png'
+import Slider from 'react-slick';
+import { ChevronRight, Search, ShoppingCart, Trash2 } from 'lucide-react';
 function NavBar()
 {
     const [loaded, setLoaded] = useState(false);
@@ -23,6 +29,17 @@ function NavBar()
     const {count} = CartData();
     const { search, setSearch } = useSearch();
     const  navigate = useNavigate();
+    const [history, setHistory] = useState(() => {
+        return JSON.parse(localStorage.getItem("searchHistory")) || [];
+    });
+    const dropdownRef = useRef(null);
+    const [visibleHistory, setVisibleHistory] = useState(2);
+    const displayedHistory = history.slice(0, visibleHistory);
+    const hasMoreHistory = visibleHistory < history.length;
+    const handleLoadMore = useCallback((e) => {
+        setVisibleHistory(prev => Math.min(prev + 2, history?.length || 0));
+      }, [history]);
+    const [focus, setFocus] = useState(false)
     const handleSearchSubmit = () => {
         const query = search.trim();
         
@@ -31,7 +48,11 @@ function NavBar()
             setTimeout(() => setSearch(""), 100); // Xóa sau khi điều hướng
         }
     };
-    
+    const handleHistoryItem = (id) => {
+        const updatedHistory = history.filter(h => h.id !== id);
+        localStorage.setItem("searchHistory", JSON.stringify(updatedHistory));
+        setHistory(updatedHistory);
+    }
     // Xóa kết quả tìm kiếm khi đóng
     const handleClose = () => {
         setSearch("");
@@ -39,23 +60,77 @@ function NavBar()
         setResults([]);
     };
 
-    const handleSearch = (id, name) => {
-        localStorage.setItem('productShow', id);
-        localStorage.setItem('productShowName', name);
-    }
-    // Xử lý thay đổi input tìm kiếm
     const handleSearchChange = (e) => {
         const value = e.target.value;
         setSearch(value);
+        setFocus(false)
         setLoading(true);
         const filteredResults = products.filter(item =>
             item.product_name.toLowerCase().includes(value.toLowerCase())
         );
+
         setResults(filteredResults);
         setTimeout(() => {
             setLoading(false);
         }, 300);
     };
+    // Xử lý chọn sản phẩm
+    const handleProduct = (product) => {
+        let viewedProducts = JSON.parse(localStorage.getItem("searchHistory")) || [];
+        // Kiểm tra nếu sản phẩm đã tồn tại trong danh sách, thì xóa nó đi trước khi thêm mới
+        viewedProducts = viewedProducts.filter(p => p.id !== product.id);
+        // Thêm sản phẩm mới lên đầu danh sách
+        viewedProducts.unshift(product);
+        // Giới hạn số lượng sản phẩm lưu (ví dụ: chỉ lưu 5 sản phẩm gần nhất)
+        if (viewedProducts.length > 5) {
+            viewedProducts.pop();
+        }
+    
+        localStorage.setItem("searchHistory", JSON.stringify(viewedProducts));
+        setHistory(viewedProducts);
+    };
+    const handleBlur = () => {
+        setTimeout(() => setFocus(false), 200);
+    };
+    const settings = {
+        infinite: true,
+        speed: 1000,
+        autoplay: true,
+        autoplaySpeed: 3000,
+        arrows: true,
+        responsive: [
+            {
+                breakpoint: 10000,
+                settings: {
+                    slidesToShow: 1,
+                    slidesToScroll: 1,
+                    infinite: true
+                },
+            },
+        ]
+    };
+    const Image = [
+        {
+            id: 1,
+            image: b1,
+        },
+        {
+            id: 2,
+            image: b2,
+        },
+        {
+            id: 3,
+            image: b3,
+        },
+        {
+            id: 4,
+            image: b4,
+        },
+    ]
+    const trendingSearches = [
+        "iPhone 16 Pro Max", "iPhone 15", "Laptop", "Carseat", "Pocket 3",
+        "iPhone 16 Pro Max", "iPhone 15", "Laptop", "Carseat", "Pocket 3",
+    ];
     return (
         <>
             <div className="container mx-auto 2xl:px-28 px-4 xl:px-10">
@@ -68,12 +143,14 @@ function NavBar()
                     </div>
 
                     {/* Tìm kiếm */}
-                    <div className="hidden items-center border border-gray-300 overflow-hidden flex-grow mx-10 relative lg:flex">
+                    <div className="hidden items-center border border-gray-300 rounded-lg overflow-hidden flex-grow mx-10 relative lg:flex shadow-sm hover:shadow-md transition-shadow duration-200">
                         <input
                             type="text"
-                            className="border-none outline-none px-2 py-2 w-full placeholder-gray-500"
+                            className="border-none outline-none px-2 py-2 w-full placeholder-gray-500 text-sm"
                             placeholder="Nhập sản phẩm tìm kiếm..."
                             value={search}
+                            onFocus={() => setFocus(true)}
+                            onBlur={handleBlur}
                             onChange={handleSearchChange}
                             onKeyDown={(e) => e.key === "Enter" && handleSearchSubmit()}
                         />
@@ -89,7 +166,8 @@ function NavBar()
                         )}
                         <button
                             onClick={handleSearchSubmit}
-                            className="bg-yellow-500 text-white px-2 py-2 hover:bg-yellow-600 transition duration-200 whitespace-nowrap">
+                            className="bg-yellow-500 text-white px-3 py-3 hover:bg-yellow-600 transition duration-200 whitespace-nowrap font-medium text-sm"
+                        >
                             Tìm kiếm
                         </button>
                     </div>
@@ -163,32 +241,155 @@ function NavBar()
                     </div>
                 </div>
 
+                { focus && (
+                    <div ref={dropdownRef} className="hidden lg:block absolute mx-auto left-11 right-24 top-[61px] bg-white border border-gray-300 shadow-lg rounded-lg z-10 transition-opacity duration-300 opacity-100 overflow-hidden mt-3 lg:w-[370px] xl:w-[578px] 2xl:w-[690px]">
+                        <div>
+                            <div className="p-4">
+                                <Slider {...settings}>
+                                    { Image.map(item => (
+                                        <img src={item.image} alt="" className="w-full h-auto rounded-lg" key={item.id} />
+                                    ))}
+                                </Slider>
+                            </div>
+                            
+                            {
+                                history && history.length > 0 ? (
+                                    <div className="px-4 pb-4">
+                                        <h3 className="text-sm font-semibold text-gray-500 mb-2">Sản phẩm đã tìm kiếm</h3>
+                                        <div className="divide-y divide-gray-100">
+                                            { displayedHistory.map(item => (
+                                                <Link to={`/product/${encodeURIComponent(item.product_name)}`} state={{id: item.id}}>
+                                                    <div key={item.id} className="flex items-center gap-3 py-3 px-2 hover:bg-blue-50 rounded-md transition-all duration-200 cursor-pointer">
+                                                        <div className="flex items-center justify-center w-8 h-8 rounded-full shadow-sm group-hover:shadow-md transition-all">
+                                                            <FaClockRotateLeft size={16} />
+                                                        </div>
+                                                        <div className="flex-1">
+                                                            <div className="font-montserrat text-[14px] text-gray-800 transition-colors">
+                                                                {item.product_name}
+                                                            </div>
+                                                        </div>
+                                                        <div className="flex items-center gap-2">
+                                                            <button 
+                                                                onMouseDown={(e) => {
+                                                                    e.preventDefault()
+                                                                    handleHistoryItem(item.id)
+                                                                }}
+                                                                className="p-1.5 text-gray-400 hover:text-red-500 rounded-full hover:bg-red-50 transition-all"
+                                                                title="Xóa sản phẩm"
+                                                            >
+                                                                <Trash2 size={16} />
+                                                            </button>   
+                                                            <div className="text-gray-400 opacity-0 transition-opacity">
+                                                                <ChevronRight size={20} />
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </Link>
+                                            ))}
+                                        </div>
+                                        {
+                                            hasMoreHistory ? (
+                                                <div className="flex justify-center mt-6">
+                                                    <button
+                                                        onMouseDown={(e) => {
+                                                            e.preventDefault();
+                                                            handleLoadMore(e);
+                                                        }}
+                                                        className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg text-sm 
+                                                                    text-gray-700 bg-white hover:bg-gray-100 transition-all duration-200 shadow-sm 
+                                                                    hover:shadow-md active:scale-95"
+                                                    >
+                                                        <IoIosArrowDown className="text-gray-500 text-lg" />
+                                                        Xem thêm sản phẩm {history.length - visibleHistory}
+                                                    </button>
+                                                </div>
+                                            ) : (
+                                                <div className="flex justify-center mt-4 cursor-pointer">
+                                                    <span
+                                                        className="flex items-center gap-2 text-sm font-medium text-gray-600 
+                                                                shadow-sm transition-all duration-200 
+                                                             active:scale-95"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            localStorage.removeItem("searchHistory");
+                                                            setHistory([]);
+                                                        }}
+                                                    >
+                                                        <Trash2 size={18} className="text-red-500" />
+                                                        Xóa tất cả
+                                                    </span>
+                                                </div>
+                                            )
+                                        }
+                                    </div>
+                                ) : (
+                                    <div>
+                                        
+                                    </div>
+                                )
+                            }
+                            <div className="bg-white p-4 rounded-lg shadow-lg w-full">
+                                <h3 className="text-lg font-semibold text-gray-800 mb-3">Xu hướng tìm kiếm</h3>
+                                <div className="flex flex-wrap gap-2">
+                                    {trendingSearches.map((item, index) => (
+                                        <button 
+                                            key={index} 
+                                            className="flex items-center gap-2 px-3 py-1.5 text-sm text-gray-700 border border-gray-300 
+                                                    rounded-full hover:bg-gray-100 transition-all"
+                                        >
+                                            <Search size={16} className="text-gray-500" />
+                                            {item}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
                 {/* Kết quả tìm kiếm trên màn hình lớn */}
                 {!isLoading && results.length > 0 && search && (
-                    <div className="hidden lg:block absolute lg:w-[370px] xl:w-[578px] 2xl:w-[690px] mx-auto left-11 right-24 max-h-[265px] top-[61px] bg-white border border-gray-300 z-10 transition-opacity duration-300 opacity-100 overflow-y-auto">
-                        {results.map(item => (
+                    <div className="hidden lg:block absolute mx-auto left-11 right-24 top-[61px] z-10 max-h-[300px] bg-white shadow-lg rounded-lg border border-gray-300 overflow-y-auto mt-3 transition-all duration-300 w-[90%] lg:w-[370px] xl:w-[578px] 2xl:w-[690px]">
+                        <div className="flex items-center px-4 py-3 bg-gray-100 border-b">
+                            <Search className="w-5 h-5 text-gray-500" />
+                            <span className="ml-2 text-gray-700 font-semibold">Kết quả tìm kiếm</span>
+                        </div>
+                        {results.map((item, index) => (
                             <div key={item.id} className="">
-                                <hr />
-                                <a href={`/product/${item.product_name}`} key={item.id} onClick={() => handleSearch(item.id, item.product_name)}>
-                                    <div className="flex justify-between items-center p-3 hover:bg-gray-100 cursor-pointer w-full">
-                                        <div className="flex-shrink-0">
-                                            <img 
-                                                src={`http://127.0.0.1:8000/imgProduct/${item.images}`} 
-                                                alt={item.product_name} 
-                                                className="w-16 h-16 object-cover rounded-md"
-                                            />
+                                {index > 0 && <hr className="border-gray-200" />}
+                                <Link
+                                    to={`/product/${item.product_name}`}
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        handleClose();
+                                        handleProduct(item);
+                                        navigate(`/product/${item.product_name}`, { state: { id: item.id } });
+                                    }}
+                                    className="flex items-center p-3 hover:bg-gray-100 cursor-pointer w-full transition-all duration-200"
+                                >
+                                    <div className="flex-shrink-0">
+                                        <img
+                                            src={`http://127.0.0.1:8000/imgProduct/${item.images}`}
+                                            alt={item.product_name}
+                                            className="w-16 h-16 object-cover rounded-md border border-gray-300"
+                                        />
+                                    </div>
+                                    <div className="flex flex-col justify-center pl-4 w-full">
+                                        <div className="flex justify-between items-center w-full">
+                                            <span className="text-[14px] text-[#000000] hover:text-yellow-600 transition-all duration-300 
+                                                            w-[250px] truncate whitespace-nowrap overflow-hidden text-ellipsis">
+                                                {item.product_name}
+                                            </span>
+                                            <ShoppingCart className="w-5 h-5 text-gray-500 flex-shrink-0" />
                                         </div>
-                                        <div className="flex flex-col justify-center pl-4">
-                                            <div className="text-xl text-[#0066cc] hover:text-yellow-600 transition-all duration-300 truncate w-[250px]">{item.product_name}</div>
-                                            <div className="text-sm text-black">
-                                                {new Intl.NumberFormat('vi-VN', {
-                                                    style: 'currency',
-                                                    currency: 'VND',
-                                                }).format(item.price)}
-                                            </div>
+                                        <div className="text-sm text-black font-semibold">
+                                            {new Intl.NumberFormat("vi-VN", {
+                                                style: "currency",
+                                                currency: "VND",
+                                            }).format(item.price)}
                                         </div>
                                     </div>
-                                </a>
+                                </Link>
                             </div>
                         ))}
                     </div>

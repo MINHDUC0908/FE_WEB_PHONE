@@ -8,6 +8,7 @@ import { ShoppingCartIcon } from "lucide-react";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import { src } from "../../../Api";
 import { IoIosArrowDown } from "react-icons/io";
+import { FaShoppingBag } from "react-icons/fa";
 
 function Product_By_Category({setCurrentTitle}) {
     const location = useLocation(); // Theo dõi sự thay đổi của route
@@ -15,8 +16,10 @@ function Product_By_Category({setCurrentTitle}) {
     const [getCategoryId, setCategoryId] = useState("");
     const { products, setId, setProducts, originalProducts, loading } = useDataGetProduct();
     const [visibleProducts, setVisibleProducts] = useState(8);
-    const [loaded, setLoaded] = useState(false);
-
+    const [loadedImages, setLoadedImages] = useState({});
+    const handleImageLoad = (id) => {
+        setLoadedImages((prev) => ({ ...prev, [id]: true }));
+    };
     const updateCategoryFromLocalStorage = () => {
         const categoryLocal = sessionStorage.getItem("category");
         const idLocal = sessionStorage.getItem("id_category");
@@ -49,11 +52,12 @@ function Product_By_Category({setCurrentTitle}) {
     if (loading) {
         return (
             <div className="fixed inset-0 z-50 flex items-center justify-center">
-                <div className="absolute inset-0 bg-black bg-opacity-50 backdrop-blur-sm"></div>
-                <div className="relative rounded-lg shadow-2xl">
-                <div className="flex justify-center mt-4">
-                    <div className="w-12 h-12 border-4 border-t-4 border-white border-t-blue-500 rounded-full animate-spin"></div>
-                </div>
+                <div className="absolute inset-0 bg-black bg-opacity-40 backdrop-blur-sm animate-fade-in"></div>
+                <div className="relative">
+                    <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-500"></div>
+                    <div className="absolute top-0 left-0 right-0 bottom-0 flex items-center justify-center">
+                        <FaShoppingBag className="text-blue-500 text-lg" />
+                    </div>
                 </div>
             </div>
         );
@@ -89,52 +93,99 @@ function Product_By_Category({setCurrentTitle}) {
                         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                             {displayedProducts.length > 0 ? (
                                 displayedProducts.map((product) => (
-                                <motion.div
-                                    key={product.id}
-                                    className="bg-white rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden group relative"
-                                >
-                                    <a
-                                        href={`/product/${encodeURIComponent(
-                                            product.product_name
-                                        )}`}
-                                        onClick={() =>
-                                            handleProduct(product.id, product.product_name)
-                                    }
+                                    <motion.div
+                                        key={product.id}
+                                        className="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden group"
+                                        whileHover={{ y: -5 }}
+                                        initial={{ opacity: 0 }}
+                                        animate={{ opacity: 1 }}
+                                        transition={{ duration: 0.3 }}
                                     >
-                                        <div className="h-[200px] lg:h-[300px] flex items-center justify-center p-4 bg-gray-50 relative">
-                                            <LazyLoadImage
-                                                src={`${src}storage/${product.thumbnail}`}
-                                                alt="" 
-                                                className={`absolute top-0 left-0 w-full h-full object-contain transition-opacity duration-500 ${loaded ? 'opacity-0' : 'opacity-100'}`}
-                                                loading="lazy"
-                                            />
-                                            <LazyLoadImage
-                                                src={loaded ? `${src}imgProduct/${product.images}` : `${src}storage/${product.thumbnail}`}  // Ảnh chính thay thế ảnh mờ khi tải xong
-                                                alt={product.product_name}  
-                                                className={`w-full h-full object-contain transition-opacity duration-500 transform ${loaded ? 'opacity-100 scale-100' : 'opacity-0 scale-90'}`} 
-                                                onLoad={() => setLoaded(true)}  
-                                                loading="lazy"
-                                                aria-hidden={!loaded} 
-                                            />
-                                        </div>
-                                        <div className="p-4">
-                                            <h3 className="text-blue-800 font-semibold mb-2 line-clamp-2 h-12">
-                                                {product.product_name}
-                                            </h3>
-                                            <div className="flex justify-between items-center">
-                                                <p className="text-lg font-bold text-red-600">
-                                                    {new Intl.NumberFormat("vi-VN", {
-                                                    style: "currency",
-                                                    currency: "VND",
-                                                    }).format(product.price)}
-                                                </p>
-                                                <button className="p-2 rounded-full bg-gray-200 text-gray-500">
-                                                    <ShoppingCartIcon className="w-5 h-5" />
-                                                </button>
+                                        <Link
+                                            to={`/product/${encodeURIComponent(product.product_name)}`}
+                                            onClick={() => handleProduct(product)}
+                                            className="block h-full"
+                                            state={{id: product.id}}
+                                        >
+                                            <div className="h-48 md:h-56 lg:h-64 relative overflow-hidden bg-gray-50">
+                                                <LazyLoadImage
+                                                    src={`${src}imgProduct/${product.images}`}
+                                                    alt={product.title}
+                                                    className={`w-full h-full object-contain transition-all duration-500 ${
+                                                        loadedImages[product.id] ? "opacity-100 scale-100" : "opacity-0 scale-95"
+                                                    }`}
+                                                    onLoad={() => handleImageLoad(product.id)}
+                                                    loading="lazy"
+                                                />
+                                                {/* Discount Badge */}
+                                                {product.discount && new Date(product.discount.end_date) > new Date() && (
+                                                    <div className="absolute top-2 right-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">
+                                                        -{product.discount.discount_value}%
+                                                    </div>
+                                                )}
                                             </div>
-                                        </div>
-                                    </a>
-                                </motion.div>
+                                            <div className="p-4">
+                                                <h3 className="text-gray-800 font-medium text-sm md:text-base mb-2 line-clamp-2 h-12 hover:text-blue-600 transition-colors">
+                                                    {product.product_name}
+                                                </h3>
+                                                <div className="mt-2">
+                                                    {product.discount && new Date(product.discount.end_date) > new Date() ? (
+                                                        <div className="flex items-baseline gap-2">
+                                                            <span className="text-lg font-bold text-red-600">
+                                                                {new Intl.NumberFormat("vi-VN", {
+                                                                    style: "currency",
+                                                                    currency: "VND",
+                                                                }).format(product.price * (1 - product.discount.discount_value / 100))}
+                                                            </span>
+                                                            <span className="text-xs text-gray-400 line-through">
+                                                                {new Intl.NumberFormat("vi-VN", {
+                                                                    style: "currency",
+                                                                    currency: "VND",
+                                                                }).format(product.price)}
+                                                            </span>
+                                                        </div>
+                                                    ) : (
+                                                        <span className="text-lg font-bold text-gray-800">
+                                                            {new Intl.NumberFormat("vi-VN", {
+                                                                style: "currency",
+                                                                currency: "VND",
+                                                            }).format(product.price)}
+                                                        </span>
+                                                    )}
+                                                </div>
+                                                {product.discount && new Date(product.discount.end_date) > new Date() && (
+                                                    <div className="flex items-center text-xs text-red-500 bg-red-50 rounded px-2 py-1">
+                                                        <svg 
+                                                            xmlns="http://www.w3.org/2000/svg" 
+                                                            fill="none" 
+                                                            viewBox="0 0 24 24" 
+                                                            strokeWidth={2} 
+                                                            stroke="currentColor" 
+                                                            className="w-4 h-4 mr-1"
+                                                        >
+                                                            <path 
+                                                                strokeLinecap="round" 
+                                                                strokeLinejoin="round" 
+                                                                d="M12 6v6l4 2m6-4A10 10 0 11.68 5.08 10 10 0 0122 12z" 
+                                                            />
+                                                        </svg>
+                                                        {product.time_left}
+                                                    </div>
+                                                )}
+                                                <div className="mt-4 flex justify-between items-center">
+                                                    <span className="text-xs text-green-400">
+                                                        {product.discount && product.discount.time_left ? 'Đang giảm giá' : 'Không có giảm giá'}
+                                                    </span>
+                                                    <button 
+                                                        className="p-2 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white transition-all duration-300 flex items-center justify-center"
+                                                        aria-label="Thêm vào giỏ hàng"
+                                                    >
+                                                        <ShoppingCartIcon className="w-5 h-5" />
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </Link>
+                                    </motion.div>
                                 ))
                             ) : (
                                 <div className="col-span-full text-center text-gray-500 py-10">

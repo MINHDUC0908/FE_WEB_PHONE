@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import img from "../../assets/ai.png";
 import { Link, useLocation } from "react-router-dom";
 import { api, formatTimeAgo, src } from "../../Api";
+import { FaShoppingBag } from "react-icons/fa";
 
 function ShowNew() {
     const [showNew, setShowNew] = useState(null);
@@ -35,7 +36,9 @@ function ShowNew() {
             }
         };
 
-        fetchShowNew();
+        setTimeout(() => {
+            fetchShowNew();
+        }, 500)
     }, [id]);
 
     useEffect(() => {
@@ -51,16 +54,19 @@ function ShowNew() {
             }
         };
 
-        fetchNew();
+        setTimeout(() => {
+            fetchNew();
+        }, 500)
     }, []);
 
     if (loadingShowNew) {
         return (
             <div className="fixed inset-0 z-50 flex items-center justify-center">
-                <div className="absolute inset-0 bg-black bg-opacity-50 backdrop-blur-sm animate-fade-in"></div>
-                <div className="relative rounded-lg shadow-2xl animate-bounce-in">
-                    <div className="flex justify-center mt-4">
-                        <div className="w-12 h-12 border-4 border-t-4 border-white border-t-blue-500 rounded-full animate-spin"></div>
+                <div className="absolute inset-0 bg-black bg-opacity-40 backdrop-blur-sm animate-fade-in"></div>
+                <div className="relative">
+                    <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-500"></div>
+                    <div className="absolute top-0 left-0 right-0 bottom-0 flex items-center justify-center">
+                        <FaShoppingBag className="text-blue-500 text-lg" />
                     </div>
                 </div>
             </div>

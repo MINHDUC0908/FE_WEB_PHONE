@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { BsCartPlus } from "react-icons/bs";
 import { toast } from "react-toastify";
 import { useDataProduct } from "../../Context/ProductContext";
@@ -14,7 +14,7 @@ import RatingProduct from "./comments/RatingProduct";
 import { FaShoppingBag } from "react-icons/fa";
 
 function ShowProduct({ setCurrentTitle }) {
-    const { product, loading, setId_product, relatedProducts, setProduct } = useDataProduct();
+    const { product, loading, setId_product, relatedProducts, setProduct, fetchProductShow } = useDataProduct();
     const { category, brand } = useData();
     const [selectedColor, setSelectedColor] = useState(null);
     const [quantity, setQuantity] = useState(1);
@@ -23,22 +23,46 @@ function ShowProduct({ setCurrentTitle }) {
     const handleQuantityChange = (value) => {
         setQuantity((prev) => Math.max(1, prev + value));
     };
-    const getFirstViewedProduct = () => {
-        let viewedProducts = JSON.parse(localStorage.getItem("viewedProducts")) || [];
-        if (viewedProducts.length > 0) {
-            return viewedProducts[0];
-        }
-        return null;
-    };
-    // Gọi hàm để lấy sản phẩm đầu tiên
-    const firstProduct = getFirstViewedProduct();
-    console.log(product)
+    const location = useLocation()
+    const id = location.state?.id;
+    // Khi ID thay đổi, reset product ngay lập tức
     useEffect(() => {
-        if (firstProduct) {
-            setId_product(firstProduct.id);
-            setCurrentTitle(`Product: ${firstProduct.product_name}`);
+        if (!id) {
+            console.log("Lỗi: Không tìm thấy ID");
+            return;
         }
-    }, [firstProduct, setId_product, setCurrentTitle]);  // Cập nhật dependency list đúng
+
+        setProduct(null); // Reset UI trước khi gọi API
+        setCurrentTitle("Đang tải...");
+        setTimeout(() => {
+            fetchProductShow(id);
+        }, 500); // Để đảm bảo UI có thời gian cập nhật
+
+    }, [id]);
+    // Cập nhật tiêu đề khi product thay đổi
+    useEffect(() => {
+        if (product) {
+            window.scrollTo(0,0)
+            setCurrentTitle(product.product_name);
+        }
+    }, [product]);
+    console.log(product)
+    // const getFirstViewedProduct = () => {
+    //     let viewedProducts = JSON.parse(localStorage.getItem("viewedProducts")) || [];
+    //     if (viewedProducts.length > 0) {
+    //         return viewedProducts[0];
+    //     }
+    //     return null;
+    // };
+    // // Gọi hàm để lấy sản phẩm đầu tiên
+    // const firstProduct = getFirstViewedProduct();
+    // console.log(product)
+    // useEffect(() => {
+    //     if (firstProduct) {
+    //         setId_product(firstProduct.id);
+    //         setCurrentTitle(`Product: ${firstProduct.product_name}`);
+    //     }
+    // }, [firstProduct, setId_product, setCurrentTitle]);  // Cập nhật dependency list đúng
     
     // Đặt màu đầu tiên có sẵn
     useEffect(() => {
@@ -52,7 +76,6 @@ function ShowProduct({ setCurrentTitle }) {
     
         setSelectedColor(firstAvailableColor ? firstAvailableColor.color : null);
     }, [product]);
-    
     
     const Breadcrumb = () => {
         const cateName = category.find((item) => item.id === product?.category_id);

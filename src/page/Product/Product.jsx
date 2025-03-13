@@ -8,6 +8,7 @@ import { LazyLoadImage } from "react-lazy-load-image-component";
 import SiderBarProduct from "./Component/SidebarProduct";
 import SortProduct from "./Component/SortProduct";
 import { FaShoppingBag } from "react-icons/fa";
+import { Link } from "react-router-dom";
 
 function Product({ setCurrentTitle }) {
     const {
@@ -104,10 +105,11 @@ function Product({ setCurrentTitle }) {
                                         animate={{ opacity: 1 }}
                                         transition={{ duration: 0.3 }}
                                     >
-                                        <a
-                                            href={`/product/${encodeURIComponent(product.product_name)}`}
+                                        <Link
+                                            to={`/product/${encodeURIComponent(product.product_name)}`}
                                             onClick={() => handleProduct(product)}
                                             className="block h-full"
+                                            state={{id: product.id}}
                                         >
                                             <div className="h-48 md:h-56 lg:h-64 relative overflow-hidden bg-gray-50">
                                                 <LazyLoadImage
@@ -186,19 +188,19 @@ function Product({ setCurrentTitle }) {
                                                     </button>
                                                 </div>
                                             </div>
-                                        </a>
+                                        </Link>
                                     </motion.div>
                                 ))
                             ) : (
                                 <div className="col-span-full flex flex-col items-center justify-center py-16 text-gray-500">
-                                <svg className="w-16 h-16 text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-                                </svg>
-                                <p className="text-lg font-medium">Không có sản phẩm nào</p>
-                                <p className="text-sm mt-2">Vui lòng thử lại với bộ lọc khác</p>
+                                    <svg className="w-16 h-16 text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                                    </svg>
+                                    <p className="text-lg font-medium">Không có sản phẩm nào</p>
+                                    <p className="text-sm mt-2">Vui lòng thử lại với bộ lọc khác</p>
                                 </div>
                             )}
-                            </div>
+                        </div>
                         {hasMoreProducts && (
                             <div className="flex justify-center mt-6">
                                 <button

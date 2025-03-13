@@ -7,6 +7,8 @@ import { useDataProduct } from "../../../Context/ProductContext";
 import { api, src } from "../../../Api";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import { Award, Eye, Heart, Package, ShieldCheck, ShoppingCart } from "lucide-react";
+import { Link } from "react-router-dom";
+import { id } from "date-fns/locale";
 
 // Nút mũi tên quay lại
 function PrevArrow(props) {
@@ -141,8 +143,9 @@ function Product() {
                                     onMouseEnter={() => setHoveredProduct(product.id)}
                                     onMouseLeave={() => setHoveredProduct(null)}
                                 >
-                                    <a
-                                        href={`/product/${encodeURIComponent(product.product_name)}`}
+                                    <Link
+                                        state={{id: product.id}}
+                                        to={`/product/${encodeURIComponent(product.product_name)}`}
                                         onClick={() => handleProduct(product)}
                                         className="block relative"
                                     >
@@ -179,7 +182,7 @@ function Product() {
                                                 </button>
                                             </div>
                                         </div>
-                                    </a>
+                                    </Link>
     
                                     <div className="p-4 flex flex-col flex-grow">
                                         <div className="flex items-center text-gray-500 text-xs mb-2">
@@ -252,9 +255,9 @@ function Product() {
                         {newProduct.map((product) => (
                             <div key={product.id} className="px-3">
                                 <div className="bg-white rounded-xl overflow-hidden transition-all duration-300 shadow-sm hover:shadow-xl border border-gray-100 h-full">
-                                    <a
-                                        href={`/product/${encodeURIComponent(product.product_name)}`}
-                                        onClick={() => handleProduct(product)}
+                                    <Link
+                                        state={{id: product.id}}
+                                        to={`/product/${encodeURIComponent(product.product_name)}`}
                                         className="h-full flex flex-col"
                                     >
                                         <div className="relative group">
@@ -341,7 +344,7 @@ function Product() {
                                                 </div>
                                             </div>
                                         </div>
-                                    </a>
+                                    </Link>
                                 </div>
                             </div>
                         ))}

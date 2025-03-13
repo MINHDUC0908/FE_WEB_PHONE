@@ -64,14 +64,14 @@ export const ProductProvider = ({ children }) => {
         }
     };
 
-    useEffect(() => {
-        if (id_product) {
-            fetchProductShow(id_product);
-        }
-    }, [id_product]);
+    // useEffect(() => {
+    //     if (id_product) {
+    //         fetchProductShow(id_product);
+    //     }
+    // }, [id_product]);
 
     return (
-        <ProductContext.Provider value={{ products, setProducts, loading, error, success, product, setId_product, relatedProducts, originalProducts, minPrice, maxPrice, setMinPrice, setMaxPrice, id_product, setProduct }}>
+        <ProductContext.Provider value={{ products, setProducts, loading, error, success, product, setId_product, relatedProducts, originalProducts, minPrice, maxPrice, setMinPrice, setMaxPrice, id_product, setProduct, fetchProductShow }}>
             {children}
         </ProductContext.Provider>
     );

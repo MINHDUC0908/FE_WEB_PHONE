@@ -3,6 +3,7 @@ import { ChevronLeft, ChevronRight, Heart, ShoppingCart, Eye, Package, ShieldChe
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import Slider from "react-slick";
 import { src } from "../../../Api";
+import { Link } from "react-router-dom";
 
 // Nút mũi tên quay lại
 function PrevArrow(props) {
@@ -89,21 +90,21 @@ function Related_Product({ relatedProducts, setId_product }) {
         setLoadedImages((prev) => ({ ...prev, [id]: true }));
     };
 
-    const handleProduct = (product) => {
-        localStorage.setItem("productShow", product.id);
-        localStorage.setItem("productShowName", product.product_name);
-        setId_product(product.id);
+    // const handleProduct = (product) => {
+    //     localStorage.setItem("productShow", product.id);
+    //     localStorage.setItem("productShowName", product.product_name);
+    //     setId_product(product.id);
         
-        let viewedProducts = JSON.parse(localStorage.getItem("viewedProducts")) || [];
-        viewedProducts = viewedProducts.filter(p => p.id !== product.id);
-        viewedProducts.unshift(product);
+    //     let viewedProducts = JSON.parse(localStorage.getItem("viewedProducts")) || [];
+    //     viewedProducts = viewedProducts.filter(p => p.id !== product.id);
+    //     viewedProducts.unshift(product);
         
-        if (viewedProducts.length > 5) {
-            viewedProducts.pop();
-        }
+    //     if (viewedProducts.length > 5) {
+    //         viewedProducts.pop();
+    //     }
         
-        localStorage.setItem("viewedProducts", JSON.stringify(viewedProducts));
-    };
+    //     localStorage.setItem("viewedProducts", JSON.stringify(viewedProducts));
+    // };
     
     return (
         <div className="bg-gradient-to-b from-gray-50 to-white py-10">
@@ -129,10 +130,10 @@ function Related_Product({ relatedProducts, setId_product }) {
                                         onMouseEnter={() => setHoveredProduct(product.id)}
                                         onMouseLeave={() => setHoveredProduct(null)}
                                     >
-                                        <a
-                                            href={`/product/${encodeURIComponent(product.product_name)}`}
-                                            onClick={() => handleProduct(product)}
+                                        <Link
+                                            to={`/product/${encodeURIComponent(product.product_name)}`}
                                             className="block relative"
+                                            state={{id: product.id}}
                                         >
                                             <div className="relative overflow-hidden group">
                                                 <div className="h-[200px] bg-gradient-to-b from-gray-50 to-white flex items-center justify-center p-4">
@@ -165,7 +166,7 @@ function Related_Product({ relatedProducts, setId_product }) {
                                                     </button>
                                                 </div>
                                             </div>
-                                        </a>
+                                        </Link>
         
                                         <div className="p-4 flex flex-col flex-grow">
                                             <div className="flex items-center text-gray-500 text-xs mb-2">
