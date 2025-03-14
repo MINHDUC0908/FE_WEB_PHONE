@@ -175,7 +175,7 @@ function Change_password({ setCurrentTitle }) {
                     ) : (
                         <div className="flex items-center gap-2">
                             <FaSignInAlt className="text-lg" />
-                            <span className="text-sm font-medium">Đổi mật khẩu</span>
+                            <span className="text-sm font-medium">Đổi gagagsagshshmật khẩu</span>
                         </div>
                     )}
                 </button>
