@@ -29,6 +29,7 @@ import { SearchProductProvider } from "./Context/SearchContext";
 import ProductSearch from "./page/Product/Search/ProductSearch";
 import { CommentProvider } from "./Context/CommentContext";
 import { RatingProvider } from "./Context/RatingContext";
+import ChatBotAi from "./page/Chat/Ai/ChatBotAI";
 
 
 function App() {
@@ -63,6 +64,7 @@ function App() {
                                                 <Header/>
                                                 <Top/>
                                                 <Chat/>
+                                                <ChatBotAi/>
                                                 <Routes>
                                                     <Route path="/search" element={<ProductSearch setCurrentTitle={setCurrentTitle}/>} />
                                                     <Route path="/product-brand/:brand_name" element={<Product_By_Brand setCurrentTitle={setCurrentTitle} />} />

@@ -1,6 +1,7 @@
-import axios from 'axios';
-import { createContext, useState, useEffect, useContext } from 'react';
-import { api } from '../Api';
+import axios from "axios";
+import { createContext, useState, useEffect, useContext } from "react";
+import { api } from "../Api";
+import { useNavigate } from "react-router-dom";
 
 const UserContext = createContext();
 
@@ -8,18 +9,26 @@ export const UserProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const navigate = useNavigate();
 
     const fetchUser = async (token) => {
         try {
             setLoading(true);
-            const res = await axios.get(api+ 'user-profile/', {
+            const res = await axios.get(api + "user-profile/", {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
             });
-            setUser(res.data);
+
+            if (res.data) {
+                setUser(res.data);
+            } else {
+                throw new Error("User data is null");
+            }
         } catch (err) {
-            setError('Failed to fetch user data');
+            setError("Failed to fetch user data");
+            localStorage.removeItem("token"); // Xóa token nếu không thể lấy user
+            setUser(null);
         } finally {
             setLoading(false);
         }
@@ -28,49 +37,37 @@ export const UserProvider = ({ children }) => {
     const login = async (formData) => {
         try {
             // 1. Đăng nhập để lấy token
-            const loginRes = await axios.post(api+ 'login', formData);
+            const loginRes = await axios.post(api + "login", formData);
             const { token } = loginRes.data;
-            
+
             // 2. Lưu token vào localStorage
-            localStorage.setItem('token', token);
-            
+            localStorage.setItem("token", token);
+
             // 3. Ngay lập tức gọi API lấy thông tin user
-            const userRes = await axios.get(api+ 'user-profile/', {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
-            
-            // 4. Set user với đầy đủ thông tin
-            setUser(userRes.data);
+            fetchUser(token);
         } catch (err) {
             throw err;
         }
     };
+
     const logout = async () => {
         const token = localStorage.getItem("token");
         if (token) {
             try {
-                const response = await axios.post(
-                    api+ "logout",
-                    {},
-                    {
-                        headers: {
-                            Authorization: `Bearer ${token}`,
-                        },
-                    }
-                );
-                localStorage.removeItem("token");
-                setUser(null);
+                await axios.post(api + "logout", {}, {
+                    headers: { Authorization: `Bearer ${token}` },
+                });
             } catch (error) {
                 console.error("Logout failed:", error);
             }
-        } else {
-            navigate("/login");
         }
-    }
+        localStorage.removeItem("token");
+        setUser(null);
+        navigate("/login");
+    };
+
     useEffect(() => {
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem("token");
         if (token) {
             fetchUser(token);
         } else {

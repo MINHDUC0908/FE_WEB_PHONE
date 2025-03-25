@@ -163,8 +163,7 @@ function Product() {
                                                     loading="lazy"
                                                 />
                                             </div>
-                                            
-                                            {product.discount && (
+                                            {product.discount && new Date(product.discount.end_date) > new Date() && (
                                                 <div className="absolute top-3 left-3">
                                                     <span className="bg-gradient-to-r from-red-500 to-red-600 text-white text-xs font-bold py-1 px-3 rounded-full flex items-center">
                                                         <Award size={12} className="mr-1" />
@@ -261,17 +260,18 @@ function Product() {
                                         className="h-full flex flex-col"
                                     >
                                         <div className="relative group">
-                                            <div className="h-[220px] bg-gradient-to-b from-gray-50 to-gray-100 flex items-center justify-center p-6">
+                                            <div className="h-[200px] bg-gradient-to-b from-gray-50 to-white flex items-center justify-center p-4">
                                                 <LazyLoadImage
                                                     src={`${src}imgProduct/${product.images}`}
-                                                    alt={product.title}
+                                                    alt={product.product_name}
                                                     className={`w-full h-full object-contain transition-all duration-500 ${
-                                                        loadedImages[product.id] ? "opacity-100 scale-100" : "opacity-0 scale-95"
-                                                    }`}
+                                                        loadedImages[product.id] 
+                                                            ? "opacity-100 scale-100" 
+                                                            : "opacity-0 scale-95"
+                                                    } ${hoveredProduct === product.id ? "transform scale-110" : ""}`}
                                                     onLoad={() => handleImageLoad(product.id)}
                                                     loading="lazy"
                                                 />
-                                                <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                                             </div>
                                         
                                             <div className="absolute top-2 left-2">

@@ -80,6 +80,9 @@ function Register()
                                     className={`w-full p-3 border ${errors.name ? 'border-red-500' : 'border-gray-300'} rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500`}
                                     placeholder="Họ và tên của bạn"
                                 />
+                                {errors.name && (
+                                    <p className="text-sm text-red-500">{errors.name[0]}</p>
+                                )}
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-700">Email hoặc số điện thoại</label>
@@ -91,7 +94,9 @@ function Register()
                                     className={`w-full p-3 border ${errors.name ? 'border-red-500' : 'border-gray-300'} rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500`}
                                     placeholder="Email hoặc số điện thoại"
                                 />
-                                
+                                {errors.email && (
+                                    <p className="text-sm text-red-500">{errors.email[0]}</p>
+                                )}
                             </div>
                             {/* <div className="flex space-x-4 w-full items-center justify-center">
                                 <input
