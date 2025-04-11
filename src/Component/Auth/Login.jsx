@@ -27,6 +27,7 @@ function Login({setCurrentTitle})
         try {
             setIsGoogleLoading(true);
             const res = await axios.get(api + "auth/google");
+            console.log("Google login response:", res.data);
             if (res.data.url) {
                 window.location.href = res.data.url;
             } else {
