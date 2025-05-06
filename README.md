@@ -17,27 +17,27 @@ Thiết Kế Tương Thích - Tối ưu hóa cho cả máy tính để bàn và 
 📱 Giao Diện Người Dùng
 Trang Chủ
 Trang đầu tiên trình bày các sản phẩm nổi bật, khuyến mãi và danh mục với menu điều hướng trực quan.
-public/home.jpg
+![alt text](public/home.jpg)
 Trang Sản Phẩm
 Duyệt sản phẩm với các tùy chọn lọc nâng cao để tìm chính xác những gì bạn cần.
-public/product.jpg
-public/filter.jpg
+![alt text](public/product.jpg)
+![alt text](public/filter.jpg)
 Chi Tiết Sản Phẩm
 Xem thông tin toàn diện về sản phẩm bao gồm thông số kỹ thuật, đánh giá của khách hàng và xếp hạng.
-public/show.jpg
-public/discription.jpg
-public/rating.jpg
+![alt text](public/show.jpg)
+![alt text](public/discription.jpg)
+![alt text](public/rating.jpg)
 Mục Tin Tức
 Cập nhật với những tin tức mới nhất về ngành, xu hướng và thông báo sản phẩm.
-public/new.jpg
-public/shownew.jpg
+![alt text](public/new.jpg)
+![alt text](public/shownew.jpg)
 Giỏ Hàng
 Quản lý các mặt hàng đã chọn của bạn và tiến hành thanh toán.
-public/cart.jpg
+![alt text](public/cart.jpg)
 Quy Trình Thanh Toán
 Hoàn tất giao dịch mua hàng với hệ thống thanh toán an toàn, thân thiện với người dùng.
-public/order.jpg
-public/addaddress.jpg
+![alt text](public/order.jpg)
+![alt text](public/addaddress.jpg)
 Hồ Sơ Người Dùng
 Quản lý thông tin cá nhân, theo dõi đơn hàng và cập nhật tùy chọn.
 public/profile.jpg
