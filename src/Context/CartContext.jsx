@@ -98,7 +98,7 @@ export const CartProvider = ({ children }) => {
             console.error("Error fetching cart:", error);
             setError("Lỗi khi tải giỏ hàng."); 
         } finally {
-            setTimeout(() => setLoading(false), 500);
+            setLoading(false);
         }
     };
     
