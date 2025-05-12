@@ -18,7 +18,7 @@ function ViewCart({setCurrentTitle}) {
     const [modal, setModal] = useState(false);
     const [deleteId, setDeleteId] = useState(null);
     const navigate = useNavigate()
-    const [loaded, setLoaded] = useState(false);
+
     const [loadedImages, setLoadedImages] = useState({});
     const handleImageLoad = (id) => {
         setLoadedImages((prev) => ({ ...prev, [id]: true }));
@@ -30,12 +30,7 @@ function ViewCart({setCurrentTitle}) {
     const [cartReady, setCartReady] = useState(false);
     useEffect(() => {
         if (!loading && cart) {
-            // Đợi một khoảng thời gian ngắn để đảm bảo dữ liệu đã được cập nhật đầy đủ
-            const timer = setTimeout(() => {
             setCartReady(true);
-            }, 200);
-            
-            return () => clearTimeout(timer);
         } else {
             setCartReady(false);
         }

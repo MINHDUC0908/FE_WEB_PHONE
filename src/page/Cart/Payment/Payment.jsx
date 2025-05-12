@@ -9,6 +9,8 @@ import { CartData } from "../../../Context/CartContext";
 import { api, src } from "../../../Api";
 import cod from "../../../assets/checkout/cod.png";
 import vnPay from "../../../assets/checkout/vnpay.png";
+import zalopay from "../../../assets/checkout/zalopay.png";
+import paypal from "../../../assets/checkout/paypal.png";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 
 function Payment({setCurrentTitle}) {
@@ -434,7 +436,14 @@ function Payment({setCurrentTitle}) {
                 // Nếu chọn VNPay, điều hướng đến trang thanh toán
                 if (selectedPayment === 'Online' && response.data.vnpay_url) {
                     window.location.href = response.data.vnpay_url; // Chuyển hướng sang VNPay
-                    toast.success("Thanh toán thành công")
+                    return;
+                } else if (selectedPayment === 'ZaloPay' && response.data.zalopay_url)
+                {
+                    window.location.href = response.data.zalopay_url;
+                    return;
+                } else if (selectedPayment === 'PayPal' && response.data.paypal_url)
+                {
+                    window.location.href = response.data.paypal_url;
                     return;
                 }
     
@@ -674,6 +683,50 @@ function Payment({setCurrentTitle}) {
                                     <div>
                                         <div className="font-medium text-gray-800">Thanh toán VNPay</div>
                                         <div className="text-xs text-gray-500">Thanh toán an toàn qua cổng VNPay</div>
+                                    </div>
+                                </label>
+
+                                {/* Thanh toán zalopay */}
+                                <label 
+                                    htmlFor="ZaloPay" 
+                                    className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition ${selectedPayment === "ZaloPay" ? "bg-orange-50 border border-orange-200" : "border border-gray-200 hover:bg-gray-50"}`}
+                                >
+                                    <input 
+                                        type="radio" 
+                                        id="ZaloPay" 
+                                        name="payment" 
+                                        className="w-5 h-5 text-orange-500 border-gray-300 focus:ring-orange-500"
+                                        checked={selectedPayment === "ZaloPay"}
+                                        onChange={() => setSelectedPayment("ZaloPay")}
+                                    />
+                                    <div className="bg-gray-100 p-2 rounded">
+                                        <img src={zalopay} alt="vnpay" className="h-[30px] w-[30px]" />
+                                    </div>
+                                    <div>
+                                        <div className="font-medium text-gray-800">Thanh toán ZaloPay</div>
+                                        <div className="text-xs text-gray-500">Thanh toán an toàn qua cổng ZaloPay</div>
+                                    </div>
+                                </label>
+
+                                {/* Thanh toán paypal */}
+                                <label 
+                                    htmlFor="PayPal" 
+                                    className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition ${selectedPayment === "PayPal" ? "bg-orange-50 border border-orange-200" : "border border-gray-200 hover:bg-gray-50"}`}
+                                >
+                                    <input 
+                                        type="radio" 
+                                        id="PayPal" 
+                                        name="payment" 
+                                        className="w-5 h-5 text-orange-500 border-gray-300 focus:ring-orange-500"
+                                        checked={selectedPayment === "PayPal"}
+                                        onChange={() => setSelectedPayment("PayPal")}
+                                    />
+                                    <div className="bg-gray-100 p-2 rounded">
+                                        <img src={paypal} alt="vnpay" className="h-[30px] w-[30px]" />
+                                    </div>
+                                    <div>
+                                        <div className="font-medium text-gray-800">Thanh toán PayPal</div>
+                                        <div className="text-xs text-gray-500">Thanh toán an toàn qua cổng PayPal</div>
                                     </div>
                                 </label>
                             </div>
