@@ -118,7 +118,6 @@ Tìm kiếm nhanh chóng và chính xác.
 - Sử dụng các thư viện React hiện đại
 - Thiết kế **Responsive** cho mọi thiết bị
 - Tích hợp **API** cho dữ liệu sản phẩm và người dùng
-- Quản lý trạng thái ứng dụng với **React Hooks / Redux**
 - Tích hợp **Chat AI** với giao diện React
 
 ---
